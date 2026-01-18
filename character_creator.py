@@ -1,82 +1,10 @@
 # import json
 import random
 
-CLASSES = ["Warrior", "Mage", "Rogue", "Paladin"]
-CLASS_STATS = {
-    "Warrior": {"Health": 100, "attack": 15, "magic": 5},
-    "Mage": {"Health": 60, "Attack": 5, "Magic": 20},
-    "Rogue": {"Health": 75, "Attack": 12, "Magic": 8},
-    "Paladin": {"Health": 85, "Attack": 10, "Magic": 12},
-}
-
-
-def create_character():
-    name = input("What is your character's name?")
-    print("Welcome," + name + "!")
-    print("Choose your class:")
-    for index, class_name in enumerate(CLASSES, start=1):
-        print(f"{index}. {class_name}")
-    while True:
-        choice = input("Enter 1, 2, 3, or 4: ")
-        if choice in ["1", "2", "3", "4"]:
-            break
-        else:
-            print("Invalid choice. Please enter 1,2,3, or 4 to continue.")
-    player_class = CLASSES[int(choice) - 1]
-    print(name + " the " + player_class + "!")
-
-    stats = CLASS_STATS[player_class]
-
-    character = {
-        "Name": name,
-        "Class": player_class,
-        "Health": stats["Health"],
-        "Max_Health": stats["Health"],
-        "Attack": stats["Attack"],
-        "Magic": stats["Magic"],
-    }
-
-    inventory = {"Health Potion": 3, "Knife": 0}
-    return character, inventory
-
+from combat import combat
+from player import create_character, display_character
 
 character, inventory = create_character()
-
-
-def display_character(character):
-    print(" ")
-    print("===  CHARACTER CREATED  ===")
-    for key, value in character.items():
-        print(f"{key}: {value}")
-    print("===========================")
-
-
-def player_attack(enemy_health, attack_power, enemy_name):
-    enemy_health -= attack_power
-    print(f"The {enemy_name} takes {attack_power} damage!")
-    return enemy_health
-
-
-def player_defend(wolf_attack, player_health):
-    damage_taken = wolf_attack // 2
-    player_health -= damage_taken
-    print(f"You take {damage_taken} damage!")
-    return player_health
-
-
-def use_potion(current_health, max_health, inventory):
-    heal_amount = random.randint(20, 25)
-    if inventory["Health Potion"] > 0:
-        inventory["Health Potion"] -= 1
-        current_health += heal_amount
-        if current_health > max_health:
-            current_health = max_health
-            print("You can't heal past max health!")
-        print(f"You drink a health potion and heal for {heal_amount} health!")
-        return current_health, inventory, True
-    else:
-        print("You have no health potions left!")
-        return current_health, inventory, False
 
 
 display_character(character)
@@ -86,69 +14,19 @@ wolf_health = random.randint(30, 50)
 wolf_attack = random.randint(5, 10)
 
 
-def enemy_damage(current_health):
-    damage_taken = random.randint(5, 10)
-    current_health -= damage_taken
-    print(f"You take {damage_taken} damage!")
-    return current_health
-
-
-def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0):
-    print(f"a {enemy_name} appears! Health: {enemy_health}")
-    while enemy_health > 0 and character["Health"] > 0:
-        print(f"Your Health: {character['Health']} | Enemy Health: {enemy_health}")
-        print(f"Potions Remaining: {inventory['Health Potion']}")
-        print("What do you do??")
-        print("1. Attack")
-        print("2. Defend")
-        print("3. Drink Potion")
-
-        action = input("Choose 1., 2., or 3.")
-
-        if action == "1":
-            print(f"You attack the {enemy_name}!")
-            enemy_health = player_attack(enemy_health, character["Attack"], enemy_name)
-            print(f"{enemy_name} Health is now: {enemy_health}")
-        elif action == "2":
-            print(f"You defend against the {enemy_name}'s attack!")
-            character["Health"] = player_defend(enemy_attack, character["Health"])
-            print(f"Health is now: {character['Health']}")
-        elif action == "3":
-            character["Health"], inventory, used = use_potion(
-                character["Health"], character["Max_Health"], inventory
-            )
-            if not used:
-                continue
-        else:
-            print("Invalid action")
-            continue
-        if enemy_health <= 0:
-            print(f"You defeated the {enemy_name}!")
-            roll = random.random()
-            if roll < 0.6:
-                inventory["Health Potion"] += 1
-                print(f"The {enemy_name} dropped a health potion! Added to inventory.")
-            elif roll < 0.9:
-                if depth < 1:
-                    print("A skeleton clambors to life and attacks!")
-                    skeleton_health = random.randint(20, 35)
-                    skeleton_attack = random.randint(4, 8)
-                    combat(
-                        "skeleton",
-                        skeleton_health,
-                        skeleton_attack,
-                        character,
-                        inventory,
-                        depth + 1,
-                    )
-            else:
-                print(f"The {enemy_name} had nothing useful..")
-        elif character["Health"] <= 0:
-            print(f"You were defeated by the {enemy_name}!")
-        else:
-            print(f"The {enemy_name} attacks!")
-            character["Health"] = enemy_damage(character["Health"])
-            print(f"Health is now: {character['Health']}")
+def owlbear_ambush(character, inventory):
+    print("Out of the darkness a huge shadow looms over you and attacks!")
+    character["Health"] = (character["Health"]) - 15
+    print("Health is now: " + str(character["Health"]))
+    owlbear_health = random.randint(40, 60)
+    owlbear_attack = random.randint(8, 15)
+    if character["Health"] <= 0:
+        print("You were defeated by the Owlbear!")
+        print("GAME OVER")
+        exit()
+    else:
+        combat("Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1)
+    return True
 
 
 def rest(character, inventory, is_dangerous=False):
@@ -159,29 +37,10 @@ def rest(character, inventory, is_dangerous=False):
         roll = random.random()
         if roll < 0.5:
             # Owlbear ambush while resting!
-            print("\nBut as you settle in, a massive shadow looms over you!")
-            print("An Owlbear attacks!")
-            print("You take 15 damage")
-            character["Health"] = character["Health"] - 15
-            owlbear_health = random.randint(40, 60)
-            owlbear_attack = random.randint(8, 15)
-            print("Health is now: " + str(character["Health"]))
-            if character["Health"] <= 0:
-                print("You were defeated by the Owlbear..")
-                print("GAME OVER")
-                return True  # Owlbear happened
-            else:
-                combat(
-                    "Owlbear",
-                    owlbear_health,
-                    owlbear_attack,
-                    character,
-                    inventory,
-                    depth=1,
-                )
-                # After Owlbear, continue with the rest
-                print("\nAfter the brutal fight, you finally get your rest...")
-
+            owlbear_ambush(character, inventory)
+            # After Owlbear, continue with the rest
+            print("\nAfter the brutal fight, you finally get your rest...")
+            return True
     if character["Health"] < character["Max_Health"]:
         character["Health"] = character["Max_Health"]
         print("You rest by the rekindled fire. Health fully restored!")
@@ -204,27 +63,7 @@ def search(inventory, character, is_dangerous=False, depth=0):
     if is_dangerous:
         # 50% Owlbear chance on dangerous search
         if roll < 0.5:
-            print(
-                "A large and menacing creature approaches with the head of an owl and the body of a bear!"
-            )
-            print("An Owlbear attacks!")
-            print("You take 15 damage")
-            character["Health"] = character["Health"] - 15
-            owlbear_health = random.randint(40, 60)
-            owlbear_attack = random.randint(8, 15)
-            print("Health is now: " + str(character["Health"]))
-            if character["Health"] <= 0:
-                print("You were defeated by the Owlbear..")
-                print("GAME OVER")
-            else:
-                combat(
-                    "Owlbear",
-                    owlbear_health,
-                    owlbear_attack,
-                    character,
-                    inventory,
-                    depth + 1,
-                )
+            owlbear_ambush(character, inventory)
             return True  # Owlbear happened
         else:
             # 50% split between potion and knife
@@ -247,28 +86,7 @@ def search(inventory, character, is_dangerous=False, depth=0):
             inventory["Knife"] += 1
             return False
         else:
-            print(
-                "A large and menacing creature approaches with the head of an owl and the body of a bear!"
-            )
-            print("An Owlbear attacks!")
-            print("You take 15 damage")
-            character["Health"] = character["Health"] - 15
-            # Owlbear stats
-            owlbear_health = random.randint(40, 60)
-            owlbear_attack = random.randint(8, 15)
-            print("Health is now: " + str(character["Health"]))
-            if character["Health"] <= 0:
-                print("You were defeated by the Owlbear..")
-                print("GAME OVER")
-            else:
-                combat(
-                    "Owlbear",
-                    owlbear_health,
-                    owlbear_attack,
-                    character,
-                    inventory,
-                    depth + 1,
-                )
+            owlbear_ambush(character, inventory)
             return True  # Owlbear happened
 
 
