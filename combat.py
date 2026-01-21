@@ -11,7 +11,7 @@ def player_attack(enemy_health, attack_power, enemy_name):
 
 
 def enemy_damage(current_health, enemy_attack):
-    damage_taken = enemy_attack
+    damage_taken = random.randint(enemy_attack - 3, enemy_attack + 3)
     current_health -= damage_taken
     print(f"You take {damage_taken} damage!")
     return current_health
