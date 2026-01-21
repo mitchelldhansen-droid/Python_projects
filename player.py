@@ -37,7 +37,7 @@ def create_character():
         "Magic": stats["Magic"],
     }
 
-    inventory = {"Health Potion": 3, "Knife": 0}
+    inventory = {"Health Potion": 3, "Knife": 0, "Gold": 0}
     return character, inventory
 
 

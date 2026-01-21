@@ -1,25 +1,21 @@
 # import json
 import random
 
-from combat import combat
+from combat import combat, pixie_encounter
 from player import create_character, display_character
+from utils import spawn_enemy
 
 character, inventory = create_character()
 
 
 display_character(character)
 
-# Wolf stats
-wolf_health = random.randint(30, 50)
-wolf_attack = random.randint(5, 10)
-
 
 def owlbear_ambush(character, inventory):
     print("Out of the darkness a huge shadow looms over you and attacks!")
     character["Health"] = (character["Health"]) - 15
     print("Health is now: " + str(character["Health"]))
-    owlbear_health = random.randint(40, 60)
-    owlbear_attack = random.randint(8, 15)
+    owlbear_health, owlbear_attack = spawn_enemy("owlbear")
     if character["Health"] <= 0:
         print("You were defeated by the Owlbear!")
         print("GAME OVER")
@@ -139,8 +135,7 @@ def boss_fight(character, inventory):
     print(
         "Your heart races and your eyes dilate as you behold an unnatural abomination of a creature. A creature who now wants to absorb you."
     )
-    boss_health = random.randint(70, 85)
-    boss_attack = random.randint(15, 18)
+    boss_health, boss_attack = spawn_enemy("abomination")
     print(
         "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
     )
@@ -166,6 +161,10 @@ def boss_fight(character, inventory):
         print("Level Up!")
         print("VICTORY!")
         print("\n" + "=" * 50)
+    else:
+        print("You have been defeated!")
+        print("GAME OVER")
+        exit()
 
 
 print(" ")
@@ -175,6 +174,7 @@ print(
 character["Health"] = character["Health"] - 10
 print("Health is now: " + str(character["Health"]))
 
+wolf_health, wolf_attack = spawn_enemy("wolf")
 combat("wolf", wolf_health, wolf_attack, character, inventory)
 
 print("\nCurrent Status:")
@@ -200,6 +200,9 @@ print("\n" + "=" * 50)
 
 boss_fight(character, inventory)
 
+print("\n" + "=" * 50)
+
+pixie_encounter(character, inventory)
 
 # Commenting Save file out so it doesn't resave every time its run
 # with open("save.json", "w") as file:
