@@ -167,19 +167,26 @@ def boss_fight(character, inventory):
         exit()
 
 
-print(" ")
-print(
-    "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
-)
-character["Health"] = character["Health"] - 10
-print("Health is now: " + str(character["Health"]))
+def wolf_ambush(character, inventory):
+    print(" ")
+    print(
+        "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
+    )
+    character["Health"] = character["Health"] - 10
+    print("Health is now: " + str(character["Health"]))
+    if character["Health"] > 0:
+        wolf_health, wolf_attack = spawn_enemy("wolf")
+        combat("wolf", wolf_health, wolf_attack, character, inventory)
+    elif character["Health"] <= 0:
+        print("You have been defeated!")
+        print("GAME OVER")
+        exit()
+    print("\nCurrent Status:")
+    print(f"Health: {character['Health']}/{character['Max_Health']}")
+    print(f"Potions: {inventory['Health Potion']}")
 
-wolf_health, wolf_attack = spawn_enemy("wolf")
-combat("wolf", wolf_health, wolf_attack, character, inventory)
 
-print("\nCurrent Status:")
-print(f"Health: {character['Health']}/{character['Max_Health']}")
-print(f"Potions: {inventory['Health Potion']}")
+wolf_ambush(character, inventory)
 
 campsite_menu(character, inventory)
 
