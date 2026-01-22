@@ -186,24 +186,31 @@ def wolf_ambush(character, inventory):
     print(f"Potions: {inventory['Health Potion']}")
 
 
+def boss_intro():
+    print("\n" + "=" * 50)
+    print(
+        "You venture forward, leaving your campsite behind confident in your decisions."
+    )
+    print(
+        "The trees grow dark, or is that just the light? It seems to be fading fast.."
+    )
+    print(
+        "You trip over a gnarled root, revealing a great and almost unnaturally large tree blocking the path forward."
+    )
+    print(
+        "By the time you register what it is, you realize it's much too late to do anything about it."
+    )
+    print(
+        "Low in timbre but high in pitch you hear a god awful hideous screaching noise that sends vibrations through your whole body."
+    )
+    print("\n" + "=" * 50)
+
+
 wolf_ambush(character, inventory)
 
 campsite_menu(character, inventory)
 
-
-print("\n" + "=" * 50)
-print("You venture forward, leaving your campsite behind confident in your decisions.")
-print("The trees grow dark, or is that just the light? It seems to be fading fast..")
-print(
-    "You trip over a gnarled root, revealing a great and almost unnaturally large tree blocking the path forward."
-)
-print(
-    "By the time you register what it is, you realize it's much too late to do anything about it."
-)
-print(
-    "Low in timbre but high in pitch you hear a god awful hideous screaching noise that sends vibrations through your whole body."
-)
-print("\n" + "=" * 50)
+boss_intro()
 
 boss_fight(character, inventory)
 
