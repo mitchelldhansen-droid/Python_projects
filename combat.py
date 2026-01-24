@@ -10,11 +10,17 @@ def player_attack(enemy_health, attack_power, enemy_name):
     return enemy_health
 
 
+# -----------------------------------------------------------------------------------
+
+
 def enemy_damage(current_health, enemy_attack):
     damage_taken = random.randint(enemy_attack - 3, enemy_attack + 3)
     current_health -= damage_taken
     print(f"You take {damage_taken} damage!")
     return current_health
+
+
+# -----------------------------------------------------------------------------------
 
 
 def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0):
@@ -78,6 +84,91 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
             print(f"Health is now: {character['Health']}")
 
 
+# ---------------------------------------------------------------------------------
+
+
+def wolf_ambush(character, inventory):
+    print(" ")
+    print(
+        "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
+    )
+    character["Health"] = character["Health"] - 10
+    print("Health is now: " + str(character["Health"]))
+    if character["Health"] > 0:
+        wolf_health, wolf_attack = spawn_enemy("wolf")
+        combat("wolf", wolf_health, wolf_attack, character, inventory)
+    elif character["Health"] <= 0:
+        print("You have been defeated!")
+        print("GAME OVER")
+        exit()
+    print("\nCurrent Status:")
+    print(f"Health: {character['Health']}/{character['Max_Health']}")
+    print(f"Potions: {inventory['Health Potion']}")
+
+
+# ----------------------------------------------------------------------------------
+
+
+def owlbear_ambush(character, inventory):
+    print("Out of the darkness a huge shadow looms over you and attacks!")
+    character["Health"] = (character["Health"]) - 15
+    print("Health is now: " + str(character["Health"]))
+    owlbear_health, owlbear_attack = spawn_enemy("owlbear")
+    if character["Health"] <= 0:
+        print("You were defeated by the Owlbear!")
+        print("GAME OVER")
+        exit()
+    else:
+        combat("Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1)
+    return True
+
+
+# ----------------------------------------------------------------------------------
+
+
+def boss_fight(character, inventory):
+    print(
+        "A massive behemoth made of bone and sinew emerges from, no, IS the twisted gnarled 'tree' you saw earlier."
+    )
+    print(
+        "You look down at yourself and see that you're covered in blood, adventurers have long come here to die, it seems."
+    )
+    print(
+        "Your heart races and your eyes dilate as you behold an unnatural abomination of a creature. A creature who now wants to absorb you."
+    )
+    boss_health, boss_attack = spawn_enemy("abomination")
+    print(
+        "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
+    )
+    character["Health"] -= 20
+    print(f"Your Health: {character['Health']}/{character['Max_Health']}")
+    if character["Health"] < 0:
+        print("You didn't stand a chance")
+        print("GAME OVER")
+        exit()
+    combat("Abomination", boss_health, boss_attack, character, inventory, depth=0)
+    if character["Health"] > 0:
+        print("\n" + "=" * 50)
+        print("You emerge victorious, the Abomination's power absorbed into you.")
+        print("You feel stronger, more resilient than ever before.")
+        character["Attack"] += 5
+        character["Magic"] += 5
+        character["Max_Health"] += 15
+        character["Health"] = character["Max_Health"]
+        print("+5 TO ALL STATS | +15 MAX HEALTH")
+        print(
+            f"Attack: {character['Attack']} | Magic: {character['Magic']} | Max Health: {character['Max_Health']}"
+        )
+        print("Level Up!")
+        print("VICTORY!")
+        print("\n" + "=" * 50)
+    else:
+        print("You have been defeated!")
+        print("GAME OVER")
+        exit()
+
+
+# ----------------------------------------------------------------------
 def pixie_encounter(character, inventory):
     print(
         "You exit the forest with your newly gained strength and come upon an idyllic glade."

@@ -1,28 +1,13 @@
 # import json
 import random
 
-from combat import combat, pixie_encounter
+from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
 from player import create_character, display_character
-from utils import spawn_enemy
 
 character, inventory = create_character()
 
 
 display_character(character)
-
-
-def owlbear_ambush(character, inventory):
-    print("Out of the darkness a huge shadow looms over you and attacks!")
-    character["Health"] = (character["Health"]) - 15
-    print("Health is now: " + str(character["Health"]))
-    owlbear_health, owlbear_attack = spawn_enemy("owlbear")
-    if character["Health"] <= 0:
-        print("You were defeated by the Owlbear!")
-        print("GAME OVER")
-        exit()
-    else:
-        combat("Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1)
-    return True
 
 
 def rest(character, inventory, is_dangerous=False):
@@ -51,6 +36,9 @@ def rest(character, inventory, is_dangerous=False):
     print(f"Potions: {inventory['Health Potion']}")
 
     return False
+
+
+# ----------------------------------------------------------------------------------
 
 
 def search(inventory, character, is_dangerous=False, depth=0):
@@ -84,6 +72,9 @@ def search(inventory, character, is_dangerous=False, depth=0):
         else:
             owlbear_ambush(character, inventory)
             return True  # Owlbear happened
+
+
+# ----------------------------------------------------------------------------------
 
 
 def campsite_menu(character, inventory):
@@ -125,65 +116,7 @@ def campsite_menu(character, inventory):
             break
 
 
-def boss_fight(character, inventory):
-    print(
-        "A massive behemoth made of bone and sinew emerges from, no, IS the twisted gnarled 'tree' you saw earlier."
-    )
-    print(
-        "You look down at yourself and see that you're covered in blood, adventurers have long come here to die, it seems."
-    )
-    print(
-        "Your heart races and your eyes dilate as you behold an unnatural abomination of a creature. A creature who now wants to absorb you."
-    )
-    boss_health, boss_attack = spawn_enemy("abomination")
-    print(
-        "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
-    )
-    character["Health"] -= 20
-    print(f"Your Health: {character['Health']}/{character['Max_Health']}")
-    if character["Health"] < 0:
-        print("You didn't stand a chance")
-        print("GAME OVER")
-        exit()
-    combat("Abomination", boss_health, boss_attack, character, inventory, depth=0)
-    if character["Health"] > 0:
-        print("\n" + "=" * 50)
-        print("You emerge victorious, the Abomination's power absorbed into you.")
-        print("You feel stronger, more resilient than ever before.")
-        character["Attack"] += 5
-        character["Magic"] += 5
-        character["Max_Health"] += 15
-        character["Health"] = character["Max_Health"]
-        print("+5 TO ALL STATS | +15 MAX HEALTH")
-        print(
-            f"Attack: {character['Attack']} | Magic: {character['Magic']} | Max Health: {character['Max_Health']}"
-        )
-        print("Level Up!")
-        print("VICTORY!")
-        print("\n" + "=" * 50)
-    else:
-        print("You have been defeated!")
-        print("GAME OVER")
-        exit()
-
-
-def wolf_ambush(character, inventory):
-    print(" ")
-    print(
-        "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
-    )
-    character["Health"] = character["Health"] - 10
-    print("Health is now: " + str(character["Health"]))
-    if character["Health"] > 0:
-        wolf_health, wolf_attack = spawn_enemy("wolf")
-        combat("wolf", wolf_health, wolf_attack, character, inventory)
-    elif character["Health"] <= 0:
-        print("You have been defeated!")
-        print("GAME OVER")
-        exit()
-    print("\nCurrent Status:")
-    print(f"Health: {character['Health']}/{character['Max_Health']}")
-    print(f"Potions: {inventory['Health Potion']}")
+# ----------------------------------------------------------------------------------
 
 
 def boss_intro():
