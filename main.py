@@ -4,10 +4,7 @@ import random
 from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
 from player import create_character, display_character
 
-character, inventory = create_character()
-
-
-display_character(character)
+current_state = "GAME_START"
 
 
 def rest(character, inventory, is_dangerous=False):
@@ -139,17 +136,31 @@ def boss_intro():
     print("\n" + "=" * 50)
 
 
-wolf_ambush(character, inventory)
+character, inventory = None, None
+while current_state != "GAME_OVER":
+    if current_state == "GAME_START":
+        character, inventory = create_character()
+        display_character(character)
+        current_state = "WOLF_COMBAT"
+    elif current_state == "WOLF_COMBAT":
+        wolf_ambush(character, inventory)
+        current_state = "CAMPSITE_MENU"
+    elif current_state == "CAMPSITE_MENU":
+        campsite_menu(character, inventory)
+        current_state = "BOSS_INTRO"
+    elif current_state == "BOSS_INTRO":
+        boss_intro()
+        current_state = "BOSS_FIGHT"
+    elif current_state == "BOSS_FIGHT":
+        boss_fight(character, inventory)
+        current_state = "PIXIE_ENCOUNTER"
+    elif current_state == "PIXIE_ENCOUNTER":
+        pixie_encounter(character, inventory)
+        current_state = "GAME_OVER"
+    elif current_state == "GAME_OVER":
+        print("Game Over")
+        break
 
-campsite_menu(character, inventory)
-
-boss_intro()
-
-boss_fight(character, inventory)
-
-print("\n" + "=" * 50)
-
-pixie_encounter(character, inventory)
 
 # Commenting Save file out so it doesn't resave every time its run
 # with open("save.json", "w") as file:

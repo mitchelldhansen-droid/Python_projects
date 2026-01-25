@@ -41,7 +41,7 @@ rpg_project/
 ```
 
 ## Current Focus
-Working on refactoring into multiple data files 1/17
+Currently working on simple state machines to control user flow
 
 ## Git Workflow
 - Create a branch for each feature: `git checkout -b feature/inventory`
