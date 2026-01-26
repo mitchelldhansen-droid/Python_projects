@@ -3,6 +3,7 @@ import random
 
 from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
 from player import create_character, display_character
+from utils import game_over
 
 current_state = "GAME_START"
 
@@ -15,7 +16,9 @@ def rest(character, inventory, is_dangerous=False):
         roll = random.random()
         if roll < 0.5:
             # Owlbear ambush while resting!
-            owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character, inventory)
+            if result == "died":
+                return "died"
             # After Owlbear, continue with the rest
             print("\nAfter the brutal fight, you finally get your rest...")
             return True
@@ -44,7 +47,9 @@ def search(inventory, character, is_dangerous=False, depth=0):
     if is_dangerous:
         # 50% Owlbear chance on dangerous search
         if roll < 0.5:
-            owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character, inventory)
+            if result == "died":
+                return "died"
             return True  # Owlbear happened
         else:
             # 50% split between potion and knife
@@ -67,7 +72,9 @@ def search(inventory, character, is_dangerous=False, depth=0):
             inventory["Knife"] += 1
             return False
         else:
-            owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character, inventory)
+            if result == "died":
+                return "died"
             return True  # Owlbear happened
 
 
@@ -91,15 +98,19 @@ def campsite_menu(character, inventory):
         print("3. Push onward to the next challenge")
         choice = input(" Choose an option:")
         if choice == "1" and not has_rested:
-            owlbear_happened = rest(character, inventory, is_dangerous=has_searched)
+            result = rest(character, inventory, is_dangerous=has_searched)
+            if result == "died":
+                return "died"
             has_rested = True
-            if owlbear_happened:
+            if result is True:  # Owlbear happened but survived
                 print("\nAfter that brutal fight, you must rest before continuing..")
                 rest(character, inventory)
         elif choice == "2" and not has_searched:
-            owlbear_happened = search(inventory, character, is_dangerous=has_rested)
+            result = search(inventory, character, is_dangerous=has_rested)
+            if result == "died":
+                return "died"
             has_searched = True
-            if owlbear_happened:
+            if result is True:  # Owlbear happened but survived
                 print("\n After that brutal fight, you must rest before continuing..")
                 rest(character, inventory)
                 break
@@ -111,6 +122,7 @@ def campsite_menu(character, inventory):
         if has_rested and has_searched:
             print("\n You've done what you can here, it's time to move on.")
             break
+    return "survived"
 
 
 # ----------------------------------------------------------------------------------
@@ -137,29 +149,51 @@ def boss_intro():
 
 
 character, inventory = None, None
-while current_state != "GAME_OVER":
+while True:
     if current_state == "GAME_START":
         character, inventory = create_character()
         display_character(character)
         current_state = "WOLF_COMBAT"
     elif current_state == "WOLF_COMBAT":
-        wolf_ambush(character, inventory)
-        current_state = "CAMPSITE_MENU"
+        result = wolf_ambush(character, inventory)
+        if result == "died":
+            current_state = "GAME_ENDING"
+        else:
+            current_state = "CAMPSITE_MENU"
     elif current_state == "CAMPSITE_MENU":
-        campsite_menu(character, inventory)
-        current_state = "BOSS_INTRO"
+        result = campsite_menu(character, inventory)
+        if result == "died":
+            current_state = "GAME_ENDING"
+        else:
+            current_state = "BOSS_INTRO"
     elif current_state == "BOSS_INTRO":
         boss_intro()
         current_state = "BOSS_FIGHT"
     elif current_state == "BOSS_FIGHT":
-        boss_fight(character, inventory)
-        current_state = "PIXIE_ENCOUNTER"
+        result = boss_fight(character, inventory)
+        if result == "died":
+            current_state = "GAME_ENDING"
+        else:
+            current_state = "PIXIE_ENCOUNTER"
     elif current_state == "PIXIE_ENCOUNTER":
-        pixie_encounter(character, inventory)
-        current_state = "GAME_OVER"
-    elif current_state == "GAME_OVER":
-        print("Game Over")
+        result = pixie_encounter(character, inventory)
+        if result == "died":
+            current_state = "GAME_ENDING"
+        else:
+            current_state = "VICTORY"
+    elif current_state == "VICTORY":
+        print("\n" + "=" * 50)
+        print("Congratulations! You've completed the adventure!")
+        if character:
+            print(f"Thanks for playing, {character['Name']}!")
+        print("=" * 50)
         break
+    elif current_state == "GAME_ENDING":
+        result = game_over(character)
+        if result == "restart":
+            current_state = "GAME_START"
+        elif result == "quit":
+            break
 
 
 # Commenting Save file out so it doesn't resave every time its run

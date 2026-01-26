@@ -64,7 +64,7 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
                 if depth < 1:
                     print("A skeleton clambors to life and attacks!")
                     skeleton_health, skeleton_attack = spawn_enemy("skeleton")
-                    combat(
+                    result = combat(
                         "skeleton",
                         skeleton_health,
                         skeleton_attack,
@@ -72,16 +72,18 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
                         inventory,
                         depth + 1,
                     )
+                    if result == "died":
+                        return "died"
             else:
                 print(f"The {enemy_name} had nothing useful..")
         elif character["Health"] <= 0:
             print(f"You were defeated by the {enemy_name}!")
-            print("GAME OVER")
-            exit()
+            return "died"
         elif not skip_enemy_turn:
             print(f"The {enemy_name} attacks!")
             character["Health"] = enemy_damage(character["Health"], enemy_attack)
             print(f"Health is now: {character['Health']}")
+    return "survived"
 
 
 # ---------------------------------------------------------------------------------
@@ -96,14 +98,15 @@ def wolf_ambush(character, inventory):
     print("Health is now: " + str(character["Health"]))
     if character["Health"] > 0:
         wolf_health, wolf_attack = spawn_enemy("wolf")
-        combat("wolf", wolf_health, wolf_attack, character, inventory)
+        result = combat("wolf", wolf_health, wolf_attack, character, inventory)
+        if result == "died":
+            return "died"
     elif character["Health"] <= 0:
-        print("You have been defeated!")
-        print("GAME OVER")
-        exit()
+        return "died"
     print("\nCurrent Status:")
     print(f"Health: {character['Health']}/{character['Max_Health']}")
     print(f"Potions: {inventory['Health Potion']}")
+    return "survived"
 
 
 # ----------------------------------------------------------------------------------
@@ -115,12 +118,15 @@ def owlbear_ambush(character, inventory):
     print("Health is now: " + str(character["Health"]))
     owlbear_health, owlbear_attack = spawn_enemy("owlbear")
     if character["Health"] <= 0:
-        print("You were defeated by the Owlbear!")
-        print("GAME OVER")
-        exit()
+        return "died"
     else:
-        combat("Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1)
-    return True
+        result = combat(
+            "Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1
+        )
+        if result == "died":
+            return "died"
+        elif result == "survived":
+            return "survived"
 
 
 # ----------------------------------------------------------------------------------
@@ -142,12 +148,14 @@ def boss_fight(character, inventory):
     )
     character["Health"] -= 20
     print(f"Your Health: {character['Health']}/{character['Max_Health']}")
-    if character["Health"] < 0:
-        print("You didn't stand a chance")
-        print("GAME OVER")
-        exit()
-    combat("Abomination", boss_health, boss_attack, character, inventory, depth=0)
-    if character["Health"] > 0:
+    if character["Health"] <= 0:
+        return "died"
+    result = combat(
+        "Abomination", boss_health, boss_attack, character, inventory, depth=0
+    )
+    if result == "died":
+        return "died"
+    else:
         print("\n" + "=" * 50)
         print("You emerge victorious, the Abomination's power absorbed into you.")
         print("You feel stronger, more resilient than ever before.")
@@ -162,10 +170,7 @@ def boss_fight(character, inventory):
         print("Level Up!")
         print("VICTORY!")
         print("\n" + "=" * 50)
-    else:
-        print("You have been defeated!")
-        print("GAME OVER")
-        exit()
+        return "survived"
 
 
 # ----------------------------------------------------------------------
@@ -213,31 +218,27 @@ def pixie_encounter(character, inventory):
             original_health = pixie_health
             pixie_health = player_attack(pixie_health, character["Attack"], "pixie")
             print(f"Health is now: {character['Health']}")
-            combat("pixie", pixie_health, pixie_attack, character, inventory, depth=0)
-            if character["Health"] > 0:
-                print("The pixie reforms somehow!")
-                combat(
-                    "pixie",
-                    original_health // 2,
-                    pixie_attack,
-                    character,
-                    inventory,
-                    depth=1,
-                )
-                if character["Health"] > 0:
-                    print(
-                        "The pixie finally dissolves in a burst of light! You are victorious!"
-                    )
-                    inventory["Gold"] += 10
-                    inventory["Health Potion"] += 2
-                else:
-                    print("You have been defeated by the pixie!")
-                    print("GAME OVER")
-                    exit()
-            else:
-                print("You have been defeated by the pixie!")
-                print("GAME OVER")
-                exit()
+            result = combat(
+                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
+            )
+            if result == "died":
+                return "died"
+            print("The pixie reforms somehow!")
+            result = combat(
+                "pixie",
+                original_health // 2,
+                pixie_attack,
+                character,
+                inventory,
+                depth=1,
+            )
+            if result == "died":
+                return "died"
+            print(
+                "The pixie finally dissolves in a burst of light! You are victorious!"
+            )
+            inventory["Gold"] += 10
+            inventory["Health Potion"] += 2
         else:
             print("Invalid choice.")
     elif inventory["Knife"] == 0:
@@ -253,53 +254,54 @@ def pixie_encounter(character, inventory):
             print("She lunges at you with unnatural speed!")
             pixie_health, pixie_attack = spawn_enemy("pixie")
             original_health = pixie_health
-            combat("pixie", pixie_health, pixie_attack, character, inventory, depth=0)
-            if character["Health"] > 0:
-                print("The pixie reforms somehow!")
-                combat(
-                    "pixie",
-                    original_health // 2,
-                    pixie_attack,
-                    character,
-                    inventory,
-                    depth=1,
-                )
-                if character["Health"] > 0:
-                    print(
-                        "The pixie finally dissolves in a burst of light! You are victorious!"
-                    )
-                    inventory["Gold"] += 10
-                    inventory["Health Potion"] += 2
-                else:
-                    print("You have been defeated!")
-                    print("GAME OVER")
-                    exit()
+            result = combat(
+                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
+            )
+            if result == "died":
+                return "died"
+            print("The pixie reforms somehow!")
+            result = combat(
+                "pixie",
+                original_health // 2,
+                pixie_attack,
+                character,
+                inventory,
+                depth=1,
+            )
+            if result == "died":
+                return "died"
+            print(
+                "The pixie finally dissolves in a burst of light! You are victorious!"
+            )
+            inventory["Gold"] += 10
+            inventory["Health Potion"] += 2
         elif choice == "2":
             print("You attack the pixie.")
             pixie_health, pixie_attack = spawn_enemy("pixie")
             original_health = pixie_health
             pixie_health = player_attack(pixie_health, character["Attack"], "pixie")
             print(f"Health is now: {character['Health']}")
-            combat("pixie", pixie_health, pixie_attack, character, inventory, depth=0)
-            if character["Health"] > 0:
-                print("The pixie reforms somehow!")
-                combat(
-                    "pixie",
-                    original_health // 2,
-                    pixie_attack,
-                    character,
-                    inventory,
-                    depth=1,
-                )
-                if character["Health"] > 0:
-                    print(
-                        "The pixie finally dissolves in a burst of light! You are victorious!"
-                    )
-                    inventory["Gold"] += 10
-                    inventory["Health Potion"] += 2
-                else:
-                    print("You have been defeated!")
-                    print("GAME OVER")
-                    exit()
+            result = combat(
+                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
+            )
+            if result == "died":
+                return "died"
+            print("The pixie reforms somehow!")
+            result = combat(
+                "pixie",
+                original_health // 2,
+                pixie_attack,
+                character,
+                inventory,
+                depth=1,
+            )
+            if result == "died":
+                return "died"
+            print(
+                "The pixie finally dissolves in a burst of light! You are victorious!"
+            )
+            inventory["Gold"] += 10
+            inventory["Health Potion"] += 2
         else:
             print("Invalid choice.")
+    return "survived"

@@ -11,6 +11,7 @@ This is a learning project: a text-based RPG built in Python. The goal is to bui
 - Don't rewrite my code unless I explicitly ask you to
 - When reviewing my code, tell me what's working first, then what could improve and *why*
 - I sometimes need things explained multiple ways before they click, and that's fine
+- If I say I don't know something, or have never done something before, explain the answer (if there is one) and recommend what might suit my learning situation best.
 
 ### What I'm practicing:
 - Functions and return values
@@ -52,4 +53,4 @@ Currently working on simple state machines to control user flow
 ## Notes
 - This RPG doesn't need to be polished—it's a learning vehicle
 - Skills here transfer to GDScript for Project Zelena (visual novel in Godot 4.5 + Dialogic 2)
-- When in doubt, keep it simple—complexity can come later
+- When in doubt, keep it simple and CLEAN —complexity can come later, but not at the cost of readability and maintainability.
