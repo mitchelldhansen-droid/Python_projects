@@ -25,9 +25,9 @@ def enemy_damage(current_health, enemy_attack):
 
 def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0):
     print(f"a {enemy_name} appears! Health: {enemy_health}")
-    while enemy_health > 0 and character["Health"] > 0:
+    while enemy_health > 0 and character.health > 0:
         skip_enemy_turn = False
-        print(f"Your Health: {character['Health']} | Enemy Health: {enemy_health}")
+        print(f"Your Health: {character.health} | Enemy Health: {enemy_health}")
         print(f"Potions Remaining: {inventory['Health Potion']}")
         print("What do you do??")
         print("1. Attack")
@@ -38,16 +38,18 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
 
         if action == "1":
             print(f"You attack the {enemy_name}!")
-            enemy_health = player_attack(enemy_health, character["Attack"], enemy_name)
+            enemy_health = player_attack(
+                enemy_health, character.attack_power, enemy_name
+            )
             print(f"{enemy_name} Health is now: {enemy_health}")
         elif action == "2":
             print(f"You defend against the {enemy_name}'s attack!")
-            character["Health"] = player_defend(enemy_attack, character["Health"])
-            print(f"Health is now: {character['Health']}")
+            character.health = player_defend(enemy_attack, character.health)
+            print(f"Health is now: {character.health}")
             skip_enemy_turn = True
         elif action == "3":
-            character["Health"], inventory, used = use_potion(
-                character["Health"], character["Max_Health"], inventory
+            character.health, inventory, used = use_potion(
+                character.health, character.max_health, inventory
             )
             if not used:
                 continue
@@ -76,13 +78,13 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
                         return "died"
             else:
                 print(f"The {enemy_name} had nothing useful..")
-        elif character["Health"] <= 0:
+        elif character.health <= 0:
             print(f"You were defeated by the {enemy_name}!")
             return "died"
         elif not skip_enemy_turn:
             print(f"The {enemy_name} attacks!")
-            character["Health"] = enemy_damage(character["Health"], enemy_attack)
-            print(f"Health is now: {character['Health']}")
+            character.health = enemy_damage(character.health, enemy_attack)
+            print(f"Health is now: {character.health}")
     return "survived"
 
 
@@ -94,17 +96,17 @@ def wolf_ambush(character, inventory):
     print(
         "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
     )
-    character["Health"] = character["Health"] - 10
-    print("Health is now: " + str(character["Health"]))
-    if character["Health"] > 0:
+    character.health = character.health - 10
+    print("Health is now: " + str(character.health))
+    if character.health > 0:
         wolf_health, wolf_attack = spawn_enemy("wolf")
         result = combat("wolf", wolf_health, wolf_attack, character, inventory)
         if result == "died":
             return "died"
-    elif character["Health"] <= 0:
+    elif character.health <= 0:
         return "died"
     print("\nCurrent Status:")
-    print(f"Health: {character['Health']}/{character['Max_Health']}")
+    print(f"Health: {character.health}/{character.max_health}")
     print(f"Potions: {inventory['Health Potion']}")
     return "survived"
 
@@ -114,10 +116,10 @@ def wolf_ambush(character, inventory):
 
 def owlbear_ambush(character, inventory):
     print("Out of the darkness a huge shadow looms over you and attacks!")
-    character["Health"] = (character["Health"]) - 15
-    print("Health is now: " + str(character["Health"]))
+    character.health = character.health - 15
+    print("Health is now: " + str(character.health))
     owlbear_health, owlbear_attack = spawn_enemy("owlbear")
-    if character["Health"] <= 0:
+    if character.health <= 0:
         return "died"
     else:
         result = combat(
@@ -146,9 +148,9 @@ def boss_fight(character, inventory):
     print(
         "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
     )
-    character["Health"] -= 20
-    print(f"Your Health: {character['Health']}/{character['Max_Health']}")
-    if character["Health"] <= 0:
+    character.health -= 20
+    print(f"Your Health: {character.health}/{character.max_health}")
+    if character.health <= 0:
         return "died"
     result = combat(
         "Abomination", boss_health, boss_attack, character, inventory, depth=0
@@ -159,13 +161,13 @@ def boss_fight(character, inventory):
         print("\n" + "=" * 50)
         print("You emerge victorious, the Abomination's power absorbed into you.")
         print("You feel stronger, more resilient than ever before.")
-        character["Attack"] += 5
-        character["Magic"] += 5
-        character["Max_Health"] += 15
-        character["Health"] = character["Max_Health"]
+        character.attack_power += 5
+        character.magic += 5
+        character.max_health += 15
+        character.health = character.max_health
         print("+5 TO ALL STATS | +15 MAX HEALTH")
         print(
-            f"Attack: {character['Attack']} | Magic: {character['Magic']} | Max Health: {character['Max_Health']}"
+            f"Attack: {character.attack_power} | Magic: {character.magic} | Max Health: {character.max_health}"
         )
         print("Level Up!")
         print("VICTORY!")
@@ -216,8 +218,8 @@ def pixie_encounter(character, inventory):
             print("You attack the pixie with your knife.")
             pixie_health, pixie_attack = spawn_enemy("pixie")
             original_health = pixie_health
-            pixie_health = player_attack(pixie_health, character["Attack"], "pixie")
-            print(f"Health is now: {character['Health']}")
+            pixie_health = player_attack(pixie_health, character.attack_power, "pixie")
+            print(f"Health is now: {character.health}")
             result = combat(
                 "pixie", pixie_health, pixie_attack, character, inventory, depth=0
             )
@@ -279,8 +281,8 @@ def pixie_encounter(character, inventory):
             print("You attack the pixie.")
             pixie_health, pixie_attack = spawn_enemy("pixie")
             original_health = pixie_health
-            pixie_health = player_attack(pixie_health, character["Attack"], "pixie")
-            print(f"Health is now: {character['Health']}")
+            pixie_health = player_attack(pixie_health, character.attack_power, "pixie")
+            print(f"Health is now: {character.health}")
             result = combat(
                 "pixie", pixie_health, pixie_attack, character, inventory, depth=0
             )

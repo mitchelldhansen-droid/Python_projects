@@ -3,6 +3,53 @@ import random
 from data.player_stats import CLASS_STATS, CLASSES
 
 
+class Character:
+    def __init__(self, name, player_class):
+        self.name = name
+        self.player_class = player_class
+        self.health = CLASS_STATS[player_class]["Health"]
+        self.max_health = CLASS_STATS[player_class]["Health"]
+        self.attack_power = CLASS_STATS[player_class]["Attack"]
+        self.magic = CLASS_STATS[player_class]["Magic"]
+        self.inventory = {"Health Potion": 3, "Knife": 0, "Gold": 0}
+
+    def display(self):
+        print(" ")
+        print("===  CHARACTER CREATED  ===")
+        for key, value in self.__dict__.items():
+            print(f"{key}: {value}")
+        print("===========================")
+
+    def __str__(self):
+        return f"{self.name} the {self.player_class}"
+
+    def take_damage(self, damage):
+        self.health -= damage
+        if self.health <= 0:
+            self.health = 0
+            print(f"{self.name} has been defeated!")
+            return "died"
+        else:
+            print(f"{self.name} has taken {damage} damage.")
+            return "damaged"
+
+    def heal(self, amount):
+        actual_heal = min(amount, self.max_health - self.health)
+        self.health += actual_heal
+        print(f"{self.name} has been healed for {actual_heal} health.")
+        return "healed"
+
+    def defend(self, damage):
+        reduced_damage = damage // 2
+        print(f"{self.name} defends!")
+        return self.take_damage(reduced_damage)
+
+    def attack(self, target):
+        damage = self.attack_power
+        print(f"{self.name} attacks {target.name}!")
+        return target.take_damage(damage)
+
+
 def display_character(character):
     print(" ")
     print("===  CHARACTER CREATED  ===")
@@ -26,19 +73,9 @@ def create_character():
     player_class = CLASSES[int(choice) - 1]
     print(name + " the " + player_class + "!")
 
-    stats = CLASS_STATS[player_class]
+    character = Character(name, player_class)
 
-    character = {
-        "Name": name,
-        "Class": player_class,
-        "Health": stats["Health"],
-        "Max_Health": stats["Health"],
-        "Attack": stats["Attack"],
-        "Magic": stats["Magic"],
-    }
-
-    inventory = {"Health Potion": 3, "Knife": 0, "Gold": 0}
-    return character, inventory
+    return character
 
 
 def player_defend(wolf_attack, player_health):

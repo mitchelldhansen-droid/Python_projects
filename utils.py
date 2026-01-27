@@ -10,7 +10,7 @@ def spawn_enemy(enemy_name):
 
 
 def game_over(character):
-    print("GAME OVER" + " " + character["Name"] + "!")
+    print("GAME OVER" + " " + character.name + "!")
     print("1. Restart")
     print("2. Quit")
     choice = input("Enter your choice: ")

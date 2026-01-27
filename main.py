@@ -22,8 +22,8 @@ def rest(character, inventory, is_dangerous=False):
             # After Owlbear, continue with the rest
             print("\nAfter the brutal fight, you finally get your rest...")
             return True
-    if character["Health"] < character["Max_Health"]:
-        character["Health"] = character["Max_Health"]
+    if character.health < character.max_health:
+        character.health = character.max_health
         print("You rest by the rekindled fire. Health fully restored!")
     else:
         print("You're already at full health, but the rest is welcome.")
@@ -32,7 +32,7 @@ def rest(character, inventory, is_dangerous=False):
     print("Searching the camp, you find a health potion left behind.")
 
     print("\nCurrent Status:")
-    print(f"Health: {character['Health']}/{character['Max_Health']}")
+    print(f"Health: {character.health}/{character.max_health}")
     print(f"Potions: {inventory['Health Potion']}")
 
     return False
@@ -151,8 +151,9 @@ def boss_intro():
 character, inventory = None, None
 while True:
     if current_state == "GAME_START":
-        character, inventory = create_character()
-        display_character(character)
+        character = create_character()
+        inventory = character.inventory
+        character.display()
         current_state = "WOLF_COMBAT"
     elif current_state == "WOLF_COMBAT":
         result = wolf_ambush(character, inventory)
@@ -185,7 +186,7 @@ while True:
         print("\n" + "=" * 50)
         print("Congratulations! You've completed the adventure!")
         if character:
-            print(f"Thanks for playing, {character['Name']}!")
+            print(f"Thanks for playing, {character.name}!")
         print("=" * 50)
         break
     elif current_state == "GAME_ENDING":
