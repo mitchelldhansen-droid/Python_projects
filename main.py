@@ -2,7 +2,7 @@
 import random
 
 from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
-from player import create_character, display_character
+from player import create_character
 from utils import game_over
 
 current_state = "GAME_START"

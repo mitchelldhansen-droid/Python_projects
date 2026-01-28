@@ -1,33 +1,14 @@
 import random
 
+from enemies import Enemy
 from player import player_defend, use_potion
-from utils import spawn_enemy
 
 
-def player_attack(enemy_health, attack_power, enemy_name):
-    enemy_health -= attack_power
-    print(f"The {enemy_name} takes {attack_power} damage!")
-    return enemy_health
-
-
-# -----------------------------------------------------------------------------------
-
-
-def enemy_damage(current_health, enemy_attack):
-    damage_taken = random.randint(enemy_attack - 3, enemy_attack + 3)
-    current_health -= damage_taken
-    print(f"You take {damage_taken} damage!")
-    return current_health
-
-
-# -----------------------------------------------------------------------------------
-
-
-def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0):
-    print(f"a {enemy_name} appears! Health: {enemy_health}")
-    while enemy_health > 0 and character.health > 0:
+def combat(enemy, character, inventory, depth=0):
+    print(f"a {enemy.name} appears! Health: {enemy.health}")
+    while enemy.health > 0 and character.health > 0:
         skip_enemy_turn = False
-        print(f"Your Health: {character.health} | Enemy Health: {enemy_health}")
+        print(f"Your Health: {character.health} | Enemy Health: {enemy.health}")
         print(f"Potions Remaining: {inventory['Health Potion']}")
         print("What do you do??")
         print("1. Attack")
@@ -37,14 +18,12 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
         action = input("Choose 1., 2., or 3.")
 
         if action == "1":
-            print(f"You attack the {enemy_name}!")
-            enemy_health = player_attack(
-                enemy_health, character.attack_power, enemy_name
-            )
-            print(f"{enemy_name} Health is now: {enemy_health}")
+            print(f"You attack the {enemy.name}!")
+            enemy.take_damage(character.attack_power)
+            print(f"{enemy.name} Health is now: {enemy.health}")
         elif action == "2":
-            print(f"You defend against the {enemy_name}'s attack!")
-            character.health = player_defend(enemy_attack, character.health)
+            print(f"You defend against the {enemy.name}'s attack!")
+            character.health = player_defend(enemy.attack_power, character.health)
             print(f"Health is now: {character.health}")
             skip_enemy_turn = True
         elif action == "3":
@@ -56,34 +35,26 @@ def combat(enemy_name, enemy_health, enemy_attack, character, inventory, depth=0
         else:
             print("Invalid action")
             continue
-        if enemy_health <= 0:
-            print(f"You defeated the {enemy_name}!")
+        if enemy.health <= 0:
+            print(f"You defeated the {enemy.name}!")
             roll = random.random()
             if roll < 0.6:
                 inventory["Health Potion"] += 1
-                print(f"The {enemy_name} dropped a health potion! Added to inventory.")
+                print(f"The {enemy.name} dropped a health potion! Added to inventory.")
             elif roll < 0.9:
                 if depth < 1:
                     print("A skeleton clambors to life and attacks!")
-                    skeleton_health, skeleton_attack = spawn_enemy("skeleton")
-                    result = combat(
-                        "skeleton",
-                        skeleton_health,
-                        skeleton_attack,
-                        character,
-                        inventory,
-                        depth + 1,
-                    )
+                    skeleton = Enemy("skeleton")
+                    result = combat(skeleton, character, inventory, depth + 1)
                     if result == "died":
                         return "died"
             else:
-                print(f"The {enemy_name} had nothing useful..")
+                print(f"The {enemy.name} had nothing useful..")
         elif character.health <= 0:
-            print(f"You were defeated by the {enemy_name}!")
+            print(f"You were defeated by the {enemy.name}!")
             return "died"
         elif not skip_enemy_turn:
-            print(f"The {enemy_name} attacks!")
-            character.health = enemy_damage(character.health, enemy_attack)
+            enemy.attack(character)
             print(f"Health is now: {character.health}")
     return "survived"
 
@@ -99,8 +70,8 @@ def wolf_ambush(character, inventory):
     character.health = character.health - 10
     print("Health is now: " + str(character.health))
     if character.health > 0:
-        wolf_health, wolf_attack = spawn_enemy("wolf")
-        result = combat("wolf", wolf_health, wolf_attack, character, inventory)
+        wolf = Enemy("wolf")
+        result = combat(wolf, character, inventory)
         if result == "died":
             return "died"
     elif character.health <= 0:
@@ -118,13 +89,11 @@ def owlbear_ambush(character, inventory):
     print("Out of the darkness a huge shadow looms over you and attacks!")
     character.health = character.health - 15
     print("Health is now: " + str(character.health))
-    owlbear_health, owlbear_attack = spawn_enemy("owlbear")
+    owlbear = Enemy("owlbear")
     if character.health <= 0:
         return "died"
     else:
-        result = combat(
-            "Owlbear", owlbear_health, owlbear_attack, character, inventory, depth=1
-        )
+        result = combat(owlbear, character, inventory, depth=1)
         if result == "died":
             return "died"
         elif result == "survived":
@@ -144,7 +113,7 @@ def boss_fight(character, inventory):
     print(
         "Your heart races and your eyes dilate as you behold an unnatural abomination of a creature. A creature who now wants to absorb you."
     )
-    boss_health, boss_attack = spawn_enemy("abomination")
+    boss = Enemy("abomination")
     print(
         "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
     )
@@ -152,9 +121,7 @@ def boss_fight(character, inventory):
     print(f"Your Health: {character.health}/{character.max_health}")
     if character.health <= 0:
         return "died"
-    result = combat(
-        "Abomination", boss_health, boss_attack, character, inventory, depth=0
-    )
+    result = combat(boss, character, inventory, depth=0)
     if result == "died":
         return "died"
     else:
@@ -216,24 +183,17 @@ def pixie_encounter(character, inventory):
             )
         elif choice == "2":
             print("You attack the pixie with your knife.")
-            pixie_health, pixie_attack = spawn_enemy("pixie")
-            original_health = pixie_health
-            pixie_health = player_attack(pixie_health, character.attack_power, "pixie")
+            pixie = Enemy("pixie")
+            original_health = pixie.health
+            pixie.take_damage(character.attack_power)
             print(f"Health is now: {character.health}")
-            result = combat(
-                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
-            )
+            result = combat(pixie, character, inventory, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
-            result = combat(
-                "pixie",
-                original_health // 2,
-                pixie_attack,
-                character,
-                inventory,
-                depth=1,
-            )
+            pixie2 = Enemy("pixie")
+            pixie2.health = original_health // 2
+            result = combat(pixie2, character, inventory, depth=1)
             if result == "died":
                 return "died"
             print(
@@ -254,22 +214,15 @@ def pixie_encounter(character, inventory):
             print("The pixie is not convinced.")
             print("You dare deceive me?")
             print("She lunges at you with unnatural speed!")
-            pixie_health, pixie_attack = spawn_enemy("pixie")
-            original_health = pixie_health
-            result = combat(
-                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
-            )
+            pixie = Enemy("pixie")
+            original_health = pixie.health
+            result = combat(pixie, character, inventory, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
-            result = combat(
-                "pixie",
-                original_health // 2,
-                pixie_attack,
-                character,
-                inventory,
-                depth=1,
-            )
+            pixie2 = Enemy("pixie")
+            pixie2.health = original_health // 2
+            result = combat(pixie2, character, inventory, depth=1)
             if result == "died":
                 return "died"
             print(
@@ -279,24 +232,17 @@ def pixie_encounter(character, inventory):
             inventory["Health Potion"] += 2
         elif choice == "2":
             print("You attack the pixie.")
-            pixie_health, pixie_attack = spawn_enemy("pixie")
-            original_health = pixie_health
-            pixie_health = player_attack(pixie_health, character.attack_power, "pixie")
+            pixie = Enemy("pixie")
+            original_health = pixie.health
+            pixie.take_damage(character.attack_power)
             print(f"Health is now: {character.health}")
-            result = combat(
-                "pixie", pixie_health, pixie_attack, character, inventory, depth=0
-            )
+            result = combat(pixie, character, inventory, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
-            result = combat(
-                "pixie",
-                original_health // 2,
-                pixie_attack,
-                character,
-                inventory,
-                depth=1,
-            )
+            pixie2 = Enemy("pixie")
+            pixie2.health = original_health // 2
+            result = combat(pixie2, character, inventory, depth=1)
             if result == "died":
                 return "died"
             print(
