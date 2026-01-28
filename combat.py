@@ -1,7 +1,6 @@
 import random
 
 from enemies import Enemy
-from player import player_defend, use_potion
 
 
 def combat(enemy, character, inventory, depth=0):
@@ -9,7 +8,7 @@ def combat(enemy, character, inventory, depth=0):
     while enemy.health > 0 and character.health > 0:
         skip_enemy_turn = False
         print(f"Your Health: {character.health} | Enemy Health: {enemy.health}")
-        print(f"Potions Remaining: {inventory['Health Potion']}")
+        print(f"Potions Remaining: {inventory.get_item_count('Health Potion')}")
         print("What do you do??")
         print("1. Attack")
         print("2. Defend")
@@ -22,15 +21,12 @@ def combat(enemy, character, inventory, depth=0):
             enemy.take_damage(character.attack_power)
             print(f"{enemy.name} Health is now: {enemy.health}")
         elif action == "2":
-            print(f"You defend against the {enemy.name}'s attack!")
-            character.health = player_defend(enemy.attack_power, character.health)
+            character.defend(enemy.attack_power)
             print(f"Health is now: {character.health}")
             skip_enemy_turn = True
         elif action == "3":
-            character.health, inventory, used = use_potion(
-                character.health, character.max_health, inventory
-            )
-            if not used:
+            result = character.use_potion()
+            if result == "no_potion":
                 continue
         else:
             print("Invalid action")
@@ -39,7 +35,7 @@ def combat(enemy, character, inventory, depth=0):
             print(f"You defeated the {enemy.name}!")
             roll = random.random()
             if roll < 0.6:
-                inventory["Health Potion"] += 1
+                inventory.add_item("Health Potion")
                 print(f"The {enemy.name} dropped a health potion! Added to inventory.")
             elif roll < 0.9:
                 if depth < 1:
@@ -78,7 +74,7 @@ def wolf_ambush(character, inventory):
         return "died"
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
-    print(f"Potions: {inventory['Health Potion']}")
+    print(f"Potions: {inventory.get_item_count('Health Potion')}")
     return "survived"
 
 
@@ -164,7 +160,7 @@ def pixie_encounter(character, inventory):
         "I'm looking for something shiny and quite pointy, would you have anything like that?"
     )
     # check if player has knife
-    if inventory["Knife"] > 0:
+    if inventory.has_item("Knife"):
         # show trade or attack options
         print("You have a knife!")
         print("1. Trade")
@@ -172,8 +168,8 @@ def pixie_encounter(character, inventory):
         choice = input("Enter your choice: ")
         if choice == "1":
             print("You trade your knife for a health potion.")
-            inventory["Knife"] -= 1
-            inventory["Health Potion"] += 1
+            inventory.remove_item("Knife")
+            inventory.add_item("Health Potion")
             print(
                 "The pixie is satisfied with your trade and smiles, and you notice she has tiny little daggers as teeth."
             )
@@ -199,11 +195,11 @@ def pixie_encounter(character, inventory):
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory["Gold"] += 10
-            inventory["Health Potion"] += 2
+            inventory.add_item("Gold", 10)
+            inventory.add_item("Health Potion", 2)
         else:
             print("Invalid choice.")
-    elif inventory["Knife"] == 0:
+    elif not inventory.has_item("Knife"):
         # show lie or attack options
         print("You don't have a knife.")
         print("1. Lie")
@@ -228,8 +224,8 @@ def pixie_encounter(character, inventory):
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory["Gold"] += 10
-            inventory["Health Potion"] += 2
+            inventory.add_item("Gold", 10)
+            inventory.add_item("Health Potion", 2)
         elif choice == "2":
             print("You attack the pixie.")
             pixie = Enemy("pixie")
@@ -248,8 +244,8 @@ def pixie_encounter(character, inventory):
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory["Gold"] += 10
-            inventory["Health Potion"] += 2
+            inventory.add_item("Gold", 10)
+            inventory.add_item("Health Potion", 2)
         else:
             print("Invalid choice.")
     return "survived"

@@ -1,6 +1,7 @@
 import random
 
 from data.player_stats import CLASS_STATS, CLASSES
+from items import Inventory
 
 
 class Character:
@@ -11,7 +12,7 @@ class Character:
         self.max_health = CLASS_STATS[player_class]["Health"]
         self.attack_power = CLASS_STATS[player_class]["Attack"]
         self.magic = CLASS_STATS[player_class]["Magic"]
-        self.inventory = {"Health Potion": 3, "Knife": 0, "Gold": 0}
+        self.inventory = Inventory()
 
     def display(self):
         print(" ")
@@ -49,13 +50,18 @@ class Character:
         print(f"{self.name} attacks {target.name}!")
         return target.take_damage(damage)
 
-
-def display_character(character):
-    print(" ")
-    print("===  CHARACTER CREATED  ===")
-    for key, value in character.items():
-        print(f"{key}: {value}")
-    print("===========================")
+    def use_potion(self):
+        if self.inventory.has_item("Health Potion"):
+            self.inventory.remove_item("Health Potion")
+            heal_amount = random.randint(20, 25)
+            self.heal(heal_amount)
+            print(
+                f"{self.name} drinks a health potion and heals for {heal_amount} health!"
+            )
+            return "healed"
+        else:
+            print(f"{self.name} has no health potions left!")
+            return "no_potion"
 
 
 def create_character():
@@ -76,25 +82,3 @@ def create_character():
     character = Character(name, player_class)
 
     return character
-
-
-def player_defend(wolf_attack, player_health):
-    damage_taken = wolf_attack // 2
-    player_health -= damage_taken
-    print(f"You take {damage_taken} damage!")
-    return player_health
-
-
-def use_potion(current_health, max_health, inventory):
-    heal_amount = random.randint(20, 25)
-    if inventory["Health Potion"] > 0:
-        inventory["Health Potion"] -= 1
-        current_health += heal_amount
-        if current_health > max_health:
-            current_health = max_health
-            print("You can't heal past max health!")
-        print(f"You drink a health potion and heal for {heal_amount} health!")
-        return current_health, inventory, True
-    else:
-        print("You have no health potions left!")
-        return current_health, inventory, False

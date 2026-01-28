@@ -28,12 +28,12 @@ def rest(character, inventory, is_dangerous=False):
     else:
         print("You're already at full health, but the rest is welcome.")
 
-    inventory["Health Potion"] += 1
+    inventory.add_item("Health Potion", 1)
     print("Searching the camp, you find a health potion left behind.")
 
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
-    print(f"Potions: {inventory['Health Potion']}")
+    print(f"Potions: {inventory.get_item_count('Health Potion')}")
 
     return False
 
@@ -57,19 +57,19 @@ def search(inventory, character, is_dangerous=False, depth=0):
                 print(
                     "You find another health potion! They must have left in a hurry..."
                 )
-                inventory["Health Potion"] += 1
+                inventory.add_item("Health Potion", 1)
             else:
                 print("You find a small knife, it might come in handy.")
-                inventory["Knife"] += 1
+                inventory.add_item("Knife", 1)
             return False  # No Owlbear
     else:
         if roll < 0.5:
             print("You find another health potion! They must have left in a hurry...")
-            inventory["Health Potion"] += 1
+            inventory.add_item("Health Potion", 1)
             return False
         elif roll < 0.9:
             print("You find a small knife, it might come in handy.")
-            inventory["Knife"] += 1
+            inventory.add_item("Knife", 1)
             return False
         else:
             result = owlbear_ambush(character, inventory)
