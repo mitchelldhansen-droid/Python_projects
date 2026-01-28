@@ -3,12 +3,14 @@ import random
 from enemies import Enemy
 
 
-def combat(enemy, character, inventory, depth=0):
+def combat(enemy, character, depth=0):
     print(f"a {enemy.name} appears! Health: {enemy.health}")
     while enemy.health > 0 and character.health > 0:
         skip_enemy_turn = False
         print(f"Your Health: {character.health} | Enemy Health: {enemy.health}")
-        print(f"Potions Remaining: {inventory.get_item_count('Health Potion')}")
+        print(
+            f"Potions Remaining: {character.inventory.get_item_count('Health Potion')}"
+        )
         print("What do you do??")
         print("1. Attack")
         print("2. Defend")
@@ -35,13 +37,13 @@ def combat(enemy, character, inventory, depth=0):
             print(f"You defeated the {enemy.name}!")
             roll = random.random()
             if roll < 0.6:
-                inventory.add_item("Health Potion")
+                character.inventory.add_item("Health Potion")
                 print(f"The {enemy.name} dropped a health potion! Added to inventory.")
             elif roll < 0.9:
                 if depth < 1:
                     print("A skeleton clambors to life and attacks!")
                     skeleton = Enemy("skeleton")
-                    result = combat(skeleton, character, inventory, depth + 1)
+                    result = combat(skeleton, character, depth + 1)
                     if result == "died":
                         return "died"
             else:
@@ -58,7 +60,7 @@ def combat(enemy, character, inventory, depth=0):
 # ---------------------------------------------------------------------------------
 
 
-def wolf_ambush(character, inventory):
+def wolf_ambush(character):
     print(" ")
     print(
         "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
@@ -67,21 +69,21 @@ def wolf_ambush(character, inventory):
     print("Health is now: " + str(character.health))
     if character.health > 0:
         wolf = Enemy("wolf")
-        result = combat(wolf, character, inventory)
+        result = combat(wolf, character)
         if result == "died":
             return "died"
     elif character.health <= 0:
         return "died"
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
-    print(f"Potions: {inventory.get_item_count('Health Potion')}")
+    print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
     return "survived"
 
 
 # ----------------------------------------------------------------------------------
 
 
-def owlbear_ambush(character, inventory):
+def owlbear_ambush(character):
     print("Out of the darkness a huge shadow looms over you and attacks!")
     character.health = character.health - 15
     print("Health is now: " + str(character.health))
@@ -89,7 +91,7 @@ def owlbear_ambush(character, inventory):
     if character.health <= 0:
         return "died"
     else:
-        result = combat(owlbear, character, inventory, depth=1)
+        result = combat(owlbear, character, depth=1)
         if result == "died":
             return "died"
         elif result == "survived":
@@ -99,7 +101,7 @@ def owlbear_ambush(character, inventory):
 # ----------------------------------------------------------------------------------
 
 
-def boss_fight(character, inventory):
+def boss_fight(character):
     print(
         "A massive behemoth made of bone and sinew emerges from, no, IS the twisted gnarled 'tree' you saw earlier."
     )
@@ -117,7 +119,7 @@ def boss_fight(character, inventory):
     print(f"Your Health: {character.health}/{character.max_health}")
     if character.health <= 0:
         return "died"
-    result = combat(boss, character, inventory, depth=0)
+    result = combat(boss, character, depth=0)
     if result == "died":
         return "died"
     else:
@@ -139,7 +141,7 @@ def boss_fight(character, inventory):
 
 
 # ----------------------------------------------------------------------
-def pixie_encounter(character, inventory):
+def pixie_encounter(character):
     print(
         "You exit the forest with your newly gained strength and come upon an idyllic glade."
     )
@@ -160,7 +162,7 @@ def pixie_encounter(character, inventory):
         "I'm looking for something shiny and quite pointy, would you have anything like that?"
     )
     # check if player has knife
-    if inventory.has_item("Knife"):
+    if character.inventory.has_item("Knife"):
         # show trade or attack options
         print("You have a knife!")
         print("1. Trade")
@@ -168,8 +170,8 @@ def pixie_encounter(character, inventory):
         choice = input("Enter your choice: ")
         if choice == "1":
             print("You trade your knife for a health potion.")
-            inventory.remove_item("Knife")
-            inventory.add_item("Health Potion")
+            character.inventory.remove_item("Knife")
+            character.inventory.add_item("Health Potion")
             print(
                 "The pixie is satisfied with your trade and smiles, and you notice she has tiny little daggers as teeth."
             )
@@ -183,23 +185,23 @@ def pixie_encounter(character, inventory):
             original_health = pixie.health
             pixie.take_damage(character.attack_power)
             print(f"Health is now: {character.health}")
-            result = combat(pixie, character, inventory, depth=0)
+            result = combat(pixie, character, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
             pixie2 = Enemy("pixie")
             pixie2.health = original_health // 2
-            result = combat(pixie2, character, inventory, depth=1)
+            result = combat(pixie2, character, depth=1)
             if result == "died":
                 return "died"
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory.add_item("Gold", 10)
-            inventory.add_item("Health Potion", 2)
+            character.inventory.add_item("Gold", 10)
+            character.inventory.add_item("Health Potion", 2)
         else:
             print("Invalid choice.")
-    elif not inventory.has_item("Knife"):
+    elif not character.inventory.has_item("Knife"):
         # show lie or attack options
         print("You don't have a knife.")
         print("1. Lie")
@@ -212,40 +214,40 @@ def pixie_encounter(character, inventory):
             print("She lunges at you with unnatural speed!")
             pixie = Enemy("pixie")
             original_health = pixie.health
-            result = combat(pixie, character, inventory, depth=0)
+            result = combat(pixie, character, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
             pixie2 = Enemy("pixie")
             pixie2.health = original_health // 2
-            result = combat(pixie2, character, inventory, depth=1)
+            result = combat(pixie2, character, depth=1)
             if result == "died":
                 return "died"
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory.add_item("Gold", 10)
-            inventory.add_item("Health Potion", 2)
+            character.inventory.add_item("Gold", 10)
+            character.inventory.add_item("Health Potion", 2)
         elif choice == "2":
             print("You attack the pixie.")
             pixie = Enemy("pixie")
             original_health = pixie.health
             pixie.take_damage(character.attack_power)
             print(f"Health is now: {character.health}")
-            result = combat(pixie, character, inventory, depth=0)
+            result = combat(pixie, character, depth=0)
             if result == "died":
                 return "died"
             print("The pixie reforms somehow!")
             pixie2 = Enemy("pixie")
             pixie2.health = original_health // 2
-            result = combat(pixie2, character, inventory, depth=1)
+            result = combat(pixie2, character, depth=1)
             if result == "died":
                 return "died"
             print(
                 "The pixie finally dissolves in a burst of light! You are victorious!"
             )
-            inventory.add_item("Gold", 10)
-            inventory.add_item("Health Potion", 2)
+            character.inventory.add_item("Gold", 10)
+            character.inventory.add_item("Health Potion", 2)
         else:
             print("Invalid choice.")
     return "survived"

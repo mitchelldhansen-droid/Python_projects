@@ -8,7 +8,7 @@ from utils import game_over
 current_state = "GAME_START"
 
 
-def rest(character, inventory, is_dangerous=False):
+def rest(character, is_dangerous=False):
     print("\nYou decide to take advantage of the nearly setup camp.")
     print("The fire pit is cold but there's dry wood stacked nearby.")
 
@@ -16,7 +16,7 @@ def rest(character, inventory, is_dangerous=False):
         roll = random.random()
         if roll < 0.5:
             # Owlbear ambush while resting!
-            result = owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character)
             if result == "died":
                 return "died"
             # After Owlbear, continue with the rest
@@ -28,12 +28,12 @@ def rest(character, inventory, is_dangerous=False):
     else:
         print("You're already at full health, but the rest is welcome.")
 
-    inventory.add_item("Health Potion", 1)
+    character.inventory.add_item("Health Potion", 1)
     print("Searching the camp, you find a health potion left behind.")
 
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
-    print(f"Potions: {inventory.get_item_count('Health Potion')}")
+    print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
 
     return False
 
@@ -41,13 +41,13 @@ def rest(character, inventory, is_dangerous=False):
 # ----------------------------------------------------------------------------------
 
 
-def search(inventory, character, is_dangerous=False, depth=0):
+def search(character, is_dangerous=False, depth=0):
     print("You decide to search around for any useful supplies")
     roll = random.random()
     if is_dangerous:
         # 50% Owlbear chance on dangerous search
         if roll < 0.5:
-            result = owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character)
             if result == "died":
                 return "died"
             return True  # Owlbear happened
@@ -57,22 +57,22 @@ def search(inventory, character, is_dangerous=False, depth=0):
                 print(
                     "You find another health potion! They must have left in a hurry..."
                 )
-                inventory.add_item("Health Potion", 1)
+                character.inventory.add_item("Health Potion", 1)
             else:
                 print("You find a small knife, it might come in handy.")
-                inventory.add_item("Knife", 1)
+                character.inventory.add_item("Knife", 1)
             return False  # No Owlbear
     else:
         if roll < 0.5:
             print("You find another health potion! They must have left in a hurry...")
-            inventory.add_item("Health Potion", 1)
+            character.inventory.add_item("Health Potion", 1)
             return False
         elif roll < 0.9:
             print("You find a small knife, it might come in handy.")
-            inventory.add_item("Knife", 1)
+            character.inventory.add_item("Knife", 1)
             return False
         else:
-            result = owlbear_ambush(character, inventory)
+            result = owlbear_ambush(character)
             if result == "died":
                 return "died"
             return True  # Owlbear happened
@@ -81,7 +81,7 @@ def search(inventory, character, is_dangerous=False, depth=0):
 # ----------------------------------------------------------------------------------
 
 
-def campsite_menu(character, inventory):
+def campsite_menu(character):
     has_rested = False
     has_searched = False
     while True:
@@ -98,21 +98,21 @@ def campsite_menu(character, inventory):
         print("3. Push onward to the next challenge")
         choice = input(" Choose an option:")
         if choice == "1" and not has_rested:
-            result = rest(character, inventory, is_dangerous=has_searched)
+            result = rest(character, is_dangerous=has_searched)
             if result == "died":
                 return "died"
             has_rested = True
             if result is True:  # Owlbear happened but survived
                 print("\nAfter that brutal fight, you must rest before continuing..")
-                rest(character, inventory)
+                rest(character)
         elif choice == "2" and not has_searched:
-            result = search(inventory, character, is_dangerous=has_rested)
+            result = search(character, is_dangerous=has_rested)
             if result == "died":
                 return "died"
             has_searched = True
             if result is True:  # Owlbear happened but survived
                 print("\n After that brutal fight, you must rest before continuing..")
-                rest(character, inventory)
+                rest(character)
                 break
         elif choice == "3":
             break
@@ -148,21 +148,20 @@ def boss_intro():
     print("\n" + "=" * 50)
 
 
-character, inventory = None, None
+character = None
 while True:
     if current_state == "GAME_START":
         character = create_character()
-        inventory = character.inventory
         character.display()
         current_state = "WOLF_COMBAT"
     elif current_state == "WOLF_COMBAT":
-        result = wolf_ambush(character, inventory)
+        result = wolf_ambush(character)
         if result == "died":
             current_state = "GAME_ENDING"
         else:
             current_state = "CAMPSITE_MENU"
     elif current_state == "CAMPSITE_MENU":
-        result = campsite_menu(character, inventory)
+        result = campsite_menu(character)
         if result == "died":
             current_state = "GAME_ENDING"
         else:
@@ -171,13 +170,13 @@ while True:
         boss_intro()
         current_state = "BOSS_FIGHT"
     elif current_state == "BOSS_FIGHT":
-        result = boss_fight(character, inventory)
+        result = boss_fight(character)
         if result == "died":
             current_state = "GAME_ENDING"
         else:
             current_state = "PIXIE_ENCOUNTER"
     elif current_state == "PIXIE_ENCOUNTER":
-        result = pixie_encounter(character, inventory)
+        result = pixie_encounter(character)
         if result == "died":
             current_state = "GAME_ENDING"
         else:
