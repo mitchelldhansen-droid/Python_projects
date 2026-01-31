@@ -65,14 +65,12 @@ def wolf_ambush(character):
     print(
         "You hear a growling, and leaves rustle as something lifts off from the forest floor and the shape of a wolf lunges towards you! You take 10 damage"
     )
-    character.health = character.health - 10
-    print("Health is now: " + str(character.health))
-    if character.health > 0:
-        wolf = Enemy("wolf")
-        result = combat(wolf, character)
-        if result == "died":
-            return "died"
-    elif character.health <= 0:
+    result = character.take_damage(10)
+    if result == "died":
+        return "died"
+    wolf = Enemy("wolf")
+    result = combat(wolf, character)
+    if result == "died":
         return "died"
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
@@ -85,17 +83,15 @@ def wolf_ambush(character):
 
 def owlbear_ambush(character):
     print("Out of the darkness a huge shadow looms over you and attacks!")
-    character.health = character.health - 15
-    print("Health is now: " + str(character.health))
-    owlbear = Enemy("owlbear")
-    if character.health <= 0:
+    result = character.take_damage(15)
+    if result == "died":
         return "died"
-    else:
-        result = combat(owlbear, character, depth=1)
-        if result == "died":
-            return "died"
-        elif result == "survived":
-            return "survived"
+    owlbear = Enemy("owlbear")
+    result = combat(owlbear, character, depth=1)
+    if result == "died":
+        return "died"
+    elif result == "survived":
+        return "survived"
 
 
 # ----------------------------------------------------------------------------------
@@ -115,9 +111,8 @@ def boss_fight(character):
     print(
         "You barely see it coming. A huge tentacle of absorbed flesh rends through the air cutting towards you."
     )
-    character.health -= 20
-    print(f"Your Health: {character.health}/{character.max_health}")
-    if character.health <= 0:
+    result = character.take_damage(20)
+    if result == "died":
         return "died"
     result = combat(boss, character, depth=0)
     if result == "died":

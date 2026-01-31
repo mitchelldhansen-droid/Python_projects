@@ -32,6 +32,7 @@ class Character:
             return "died"
         else:
             print(f"{self.name} has taken {damage} damage.")
+            print(f"Health is now: {self.health}")
             return "damaged"
 
     def heal(self, amount):
