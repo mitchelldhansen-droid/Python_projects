@@ -140,6 +140,28 @@ def boss_fight(character):
         return "survived"
 
 
+# -------------------------------------------------------------------------------
+def pixie_combat(character, first_strike=False):
+    pixie = Enemy("pixie")
+    original_health = pixie.health
+    if first_strike:
+        pixie.take_damage(character.attack_power)
+        print(f"Health is now: {character.health}")
+    result = combat(pixie, character, depth=0)
+    if result == "died":
+        return "died"
+    print("The pixie reforms somehow!")
+    pixie2 = Enemy("pixie")
+    pixie2.health = original_health // 2
+    result = combat(pixie2, character, depth=1)
+    if result == "died":
+        return "died"
+    print("The pixie finally dissolves in a burst of light! You are victorious!")
+    character.inventory.add_item("Gold", 10)
+    character.inventory.add_item("Health Potion", 2)
+    return "survived"
+
+
 # ----------------------------------------------------------------------
 def pixie_encounter(character):
     print(
@@ -167,87 +189,50 @@ def pixie_encounter(character):
         print("You have a knife!")
         print("1. Trade")
         print("2. Attack")
-        choice = input("Enter your choice: ")
-        if choice == "1":
-            print("You trade your knife for a health potion.")
-            character.inventory.remove_item("Knife")
-            character.inventory.add_item("Health Potion")
-            print(
-                "The pixie is satisfied with your trade and smiles, and you notice she has tiny little daggers as teeth."
-            )
-            print("She inserts the dagger into her mouth, waves, and flies away.")
-            print(
-                "You have the feeling nothing here is going to make sense, and that you just avoided a difficult encounter."
-            )
-        elif choice == "2":
-            print("You attack the pixie with your knife.")
-            pixie = Enemy("pixie")
-            original_health = pixie.health
-            pixie.take_damage(character.attack_power)
-            print(f"Health is now: {character.health}")
-            result = combat(pixie, character, depth=0)
-            if result == "died":
-                return "died"
-            print("The pixie reforms somehow!")
-            pixie2 = Enemy("pixie")
-            pixie2.health = original_health // 2
-            result = combat(pixie2, character, depth=1)
-            if result == "died":
-                return "died"
-            print(
-                "The pixie finally dissolves in a burst of light! You are victorious!"
-            )
-            character.inventory.add_item("Gold", 10)
-            character.inventory.add_item("Health Potion", 2)
-        else:
-            print("Invalid choice.")
+        while True:
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                print("You trade your knife for a health potion.")
+                character.inventory.remove_item("Knife")
+                character.inventory.add_item("Health Potion")
+                print(
+                    "The pixie is satisfied with your trade and smiles, and you notice she has tiny little daggers as teeth."
+                )
+                print("She inserts the dagger into her mouth, waves, and flies away.")
+                print(
+                    "You have the feeling nothing here is going to make sense, and that you just avoided a difficult encounter."
+                )
+                break
+            elif choice == "2":
+                print("You attack the pixie with your knife before she can react!")
+                result = pixie_combat(character, first_strike=True)
+                if result == "died":
+                    return "died"
+                break
+            else:
+                print("Invalid choice.")
     elif not character.inventory.has_item("Knife"):
         # show lie or attack options
         print("You don't have a knife.")
         print("1. Lie")
         print("2. Attack")
-        choice = input("Enter your choice: ")
-        if choice == "1":
-            print("You lie to the pixie.")
-            print("The pixie is not convinced.")
-            print("You dare deceive me?")
-            print("She lunges at you with unnatural speed!")
-            pixie = Enemy("pixie")
-            original_health = pixie.health
-            result = combat(pixie, character, depth=0)
-            if result == "died":
-                return "died"
-            print("The pixie reforms somehow!")
-            pixie2 = Enemy("pixie")
-            pixie2.health = original_health // 2
-            result = combat(pixie2, character, depth=1)
-            if result == "died":
-                return "died"
-            print(
-                "The pixie finally dissolves in a burst of light! You are victorious!"
-            )
-            character.inventory.add_item("Gold", 10)
-            character.inventory.add_item("Health Potion", 2)
-        elif choice == "2":
-            print("You attack the pixie.")
-            pixie = Enemy("pixie")
-            original_health = pixie.health
-            pixie.take_damage(character.attack_power)
-            print(f"Health is now: {character.health}")
-            result = combat(pixie, character, depth=0)
-            if result == "died":
-                return "died"
-            print("The pixie reforms somehow!")
-            pixie2 = Enemy("pixie")
-            pixie2.health = original_health // 2
-            result = combat(pixie2, character, depth=1)
-            if result == "died":
-                return "died"
-            print(
-                "The pixie finally dissolves in a burst of light! You are victorious!"
-            )
-            character.inventory.add_item("Gold", 10)
-            character.inventory.add_item("Health Potion", 2)
-        else:
-            print("Invalid choice.")
+        while True:
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                print("You lie to the pixie.")
+                print("The pixie is not convinced.")
+                print("You dare deceive me?")
+                print("She lunges at you with unnatural speed!")
+                result = pixie_combat(character, first_strike=False)
+                if result == "died":
+                    return "died"
+                break
+            elif choice == "2":
+                print("You attack the pixie outright!")
+                result = pixie_combat(character, first_strike=True)
+                if result == "died":
+                    return "died"
+                break
+            else:
+                print("Invalid choice.")
     return "survived"
