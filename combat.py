@@ -54,6 +54,9 @@ def combat(enemy, character, depth=0):
         elif not skip_enemy_turn:
             enemy.attack(character)
             print(f"Health is now: {character.health}")
+            if character.health <= 0:
+                print(f"You were defeated by the {enemy.name}!")
+                return "died"
     return "survived"
 
 
@@ -222,4 +225,89 @@ def pixie_encounter(character):
                 break
             else:
                 print("Invalid choice.")
+    return "survived"
+
+
+def bandit_leader_combat(character):
+    print("\n" + "=" * 50)
+    if character.path_taken == "glade":
+        print(
+            "After narrowly escaping the poppy field, you notice a bandit group blocking your path at the edge of the wilderness."
+        )
+        print(
+            "'You must be very sleepy after all them poppies, why don't you just turn around and march home. This here's Black Flag territory.' the bandit leader says."
+        )
+    elif character.path_taken == "forest":
+        print("You approach the edge of the wilderness cautiously.")
+        print("You notice a bandit group blocking your path.")
+        print(
+            "'Come out, come out, wherever you are! I wanna have some FUN!' The bandit leader says."
+        )
+    print(
+        "'If you wanna pass, you'll have to make it through me.' the bandit leader says."
+    )
+    print("You ready yourself for battle.")
+    if character.has_companion:
+        print("Your companion steps forward, ready to fight alongside you.")
+        print(
+            "'I used to run with the black flag gang, when I challenged the leader, I got sentenced to exile in the forest' your companion says."
+        )
+        print(
+            "'Together, we might be able to challenge him to a duel and take him down.'"
+        )
+    bandit_leader = Enemy("bandit_leader")
+    while bandit_leader.health > 0 and character.health > 0:
+        skip_enemy_turn = False
+        print(
+            f"\nYour Health: {character.health} | Enemy Health: {bandit_leader.health}"
+        )
+        print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
+        if character.has_companion:
+            print(
+                "(Through coordinated strikes, Your Companion doubles your attack damage!)"
+            )
+        print("1.Attack")
+        print("2.Defend")
+        print("3.Drink Potion")
+        action = input("Choose 1, 2, or 3:")
+        if action == "1":
+            damage = character.attack_power
+            if character.has_companion:
+                damage = damage * 2
+                print("You and your companion strike together!")
+            else:
+                print("You attack the bandit leader!")
+            bandit_leader.take_damage(damage)
+            print(f"Bandit Leader's Health: {bandit_leader.health}")
+        elif action == "2":
+            character.defend(bandit_leader.attack_power)
+            print("You defend yourself!")
+            skip_enemy_turn = True
+        elif action == "3":
+            result = character.use_potion()
+            if result == "no_potion":
+                continue
+        else:
+            print("Invalid action!")
+            continue
+        if bandit_leader.health <= 0:
+            print("You defeated the bandit leader!")
+            print("\n" + "=" * 50)
+            print(
+                "You emerge victorious, none of the bandits dare question your strength after defeating their leader."
+            )
+            print("Your reputation grows, and you become a legend in the land.")
+            character.level_up()
+            print("VICTORY!")
+            print("\n" + "=" * 50)
+            # Any victory rewards/narrative here
+        elif character.health <= 0:
+            print("You were defeated by the bandit leader!")
+            return "died"
+        elif not skip_enemy_turn:
+            bandit_leader.attack(character)
+            print(f"Health is now: {character.health}")
+            if character.health <= 0:
+                print(f"You were defeated by the {bandit_leader.name}!")
+                return "died"
     return "survived"

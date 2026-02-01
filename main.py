@@ -1,7 +1,14 @@
 # import json
 import random
 
-from combat import boss_fight, combat, owlbear_ambush, pixie_encounter, wolf_ambush
+from combat import (
+    bandit_leader_combat,
+    boss_fight,
+    combat,
+    owlbear_ambush,
+    pixie_encounter,
+    wolf_ambush,
+)
 from enemies import Enemy
 from player import create_character
 from utils import game_over
@@ -387,13 +394,41 @@ if __name__ == "__main__":
                 current_state = "PATH_CHOICE"
         elif current_state == "PATH_CHOICE":
             result = path_choice(character)
-            current_state = "VICTORY"
+            if result == "glade":
+                current_state = "GLADE_PATH"
+            else:
+                current_state = "FOREST_PATH"
+        elif current_state == "GLADE_PATH":
+            result = glade_path(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "BANDIT_COMBAT"
+        elif current_state == "FOREST_PATH":
+            result = forest_path(character)
+            current_state = "BANDIT_COMBAT"
+        elif current_state == "BANDIT_COMBAT":
+            result = bandit_leader_combat(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "VICTORY"
         elif current_state == "VICTORY":
             print("\n" + "=" * 50)
             print("Congratulations! You've completed the adventure!")
             if character:
-                print(f"Thanks for playing, {character.name}!")
-            print("=" * 50)
+                if character.path_taken == "glade":
+                    print(
+                        "\nBattered but powerful, you emerge from the wilderness alone."
+                    )
+                    print("The trials have made you stronger than you ever imagined.")
+                elif character.path_taken == "forest" and character.has_companion:
+                    print("\nYou and your ally share a moment of triumph.")
+                    print("'Until next time, friend,' they say, clasping your hand.")
+                elif character.path_taken == "forest":
+                    print("\nYou made it through, though you walk alone.")
+                print(f"\nThanks for playing, {character.name}!")
+                print("=" * 50)
             break
         elif current_state == "GAME_ENDING":
             result = game_over(character)
