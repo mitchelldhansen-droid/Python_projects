@@ -13,6 +13,7 @@ class Character:
         self.attack_power = CLASS_STATS[player_class]["Attack"]
         self.magic = CLASS_STATS[player_class]["Magic"]
         self.inventory = Inventory()
+        self.level = 1
         self.has_companion = False
         self.path_taken = None
 
@@ -65,6 +66,18 @@ class Character:
         else:
             print(f"{self.name} has no health potions left!")
             return "no_potion"
+
+    def level_up(self):
+        self.level += 1
+        self.max_health += 15
+        self.health = self.max_health
+        self.attack_power += 5
+        self.magic += 5
+        print(f"{self.name} has leveled up to level {self.level}!")
+        print("+5 TO ALL STATS | +15 MAX HEALTH")
+        print(
+            f"Attack: {self.attack_power} | Magic: {self.magic} | Max Health: {self.max_health}"
+        )
 
 
 def create_character():

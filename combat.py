@@ -121,15 +121,7 @@ def boss_fight(character):
         print("\n" + "=" * 50)
         print("You emerge victorious, the Abomination's power absorbed into you.")
         print("You feel stronger, more resilient than ever before.")
-        character.attack_power += 5
-        character.magic += 5
-        character.max_health += 15
-        character.health = character.max_health
-        print("+5 TO ALL STATS | +15 MAX HEALTH")
-        print(
-            f"Attack: {character.attack_power} | Magic: {character.magic} | Max Health: {character.max_health}"
-        )
-        print("Level Up!")
+        character.level_up()
         print("VICTORY!")
         print("\n" + "=" * 50)
         return "survived"
