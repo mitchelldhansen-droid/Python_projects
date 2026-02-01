@@ -2,7 +2,7 @@
 import random
 
 from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
-from player import create_character
+from player import Character, create_character
 from utils import game_over
 
 current_state = "GAME_START"
@@ -148,52 +148,88 @@ def boss_intro():
     print("\n" + "=" * 50)
 
 
-character = None
-while True:
-    if current_state == "GAME_START":
-        character = create_character()
-        character.display()
-        current_state = "WOLF_COMBAT"
-    elif current_state == "WOLF_COMBAT":
-        result = wolf_ambush(character)
-        if result == "died":
-            current_state = "GAME_ENDING"
+# ------------------------------------------------------------------------------------------------------------------
+
+
+def path_choice(character):
+    print("\n" + "=" * 50)
+    print("Having dealt with the pixie, you must now choose a path")
+    print("Which path do you choose?")
+    print("1. Continue into the idyllic glade, risking the unknown for power untold")
+    print(
+        "2. Take the longer path back through the forest, avoiding the glade entirely"
+    )
+    print("Both paths offer something, both paths will challenge you.")
+    while True:
+        choice = input("Enter your choice: ")
+        if choice == "1":
+            print("You venture forth into the idyllic glade.")
+            print("flavor text here, poppies slowly make you sleepy")
+            # Stats roll check here
+            character.path_taken = "glade"
+            character.level_up()
+            return "glade"
+        elif choice == "2":
+            print(
+                "You double back, returning to the devil you know for the devil you don't."
+            )
+            print("Flavor text here, you meet an adventurer who offers you a deal.")
+            # stats roll check here
+            character.path_taken = "forest"
+            character.has_companion = True
+            return "forest"
         else:
-            current_state = "CAMPSITE_MENU"
-    elif current_state == "CAMPSITE_MENU":
-        result = campsite_menu(character)
-        if result == "died":
-            current_state = "GAME_ENDING"
-        else:
-            current_state = "BOSS_INTRO"
-    elif current_state == "BOSS_INTRO":
-        boss_intro()
-        current_state = "BOSS_FIGHT"
-    elif current_state == "BOSS_FIGHT":
-        result = boss_fight(character)
-        if result == "died":
-            current_state = "GAME_ENDING"
-        else:
-            current_state = "PIXIE_ENCOUNTER"
-    elif current_state == "PIXIE_ENCOUNTER":
-        result = pixie_encounter(character)
-        if result == "died":
-            current_state = "GAME_ENDING"
-        else:
-            current_state = "VICTORY"
-    elif current_state == "VICTORY":
-        print("\n" + "=" * 50)
-        print("Congratulations! You've completed the adventure!")
-        if character:
-            print(f"Thanks for playing, {character.name}!")
-        print("=" * 50)
-        break
-    elif current_state == "GAME_ENDING":
-        result = game_over(character)
-        if result == "restart":
-            current_state = "GAME_START"
-        elif result == "quit":
+            print("Invalid choice.")
+            continue
+
+
+if __name__ == "__main__":
+    character = None
+    while True:
+        if current_state == "GAME_START":
+            character = create_character()
+            character.display()
+            current_state = "WOLF_COMBAT"
+        elif current_state == "WOLF_COMBAT":
+            result = wolf_ambush(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "CAMPSITE_MENU"
+        elif current_state == "CAMPSITE_MENU":
+            result = campsite_menu(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "BOSS_INTRO"
+        elif current_state == "BOSS_INTRO":
+            boss_intro()
+            current_state = "BOSS_FIGHT"
+        elif current_state == "BOSS_FIGHT":
+            result = boss_fight(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "PIXIE_ENCOUNTER"
+        elif current_state == "PIXIE_ENCOUNTER":
+            result = pixie_encounter(character)
+            if result == "died":
+                current_state = "GAME_ENDING"
+            else:
+                current_state = "VICTORY"
+        elif current_state == "VICTORY":
+            print("\n" + "=" * 50)
+            print("Congratulations! You've completed the adventure!")
+            if character:
+                print(f"Thanks for playing, {character.name}!")
+            print("=" * 50)
             break
+        elif current_state == "GAME_ENDING":
+            result = game_over(character)
+            if result == "restart":
+                current_state = "GAME_START"
+            elif result == "quit":
+                break
 
 
 # Commenting Save file out so it doesn't resave every time its run
