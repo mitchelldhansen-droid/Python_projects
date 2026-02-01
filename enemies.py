@@ -5,7 +5,7 @@ from data.enemy_stats import ENEMY_STATS
 
 class Enemy:
     def __init__(self, enemy_type):
-        self.name = enemy_type
+        self.name = enemy_type.replace("_", " ").title()
         self.health = random.randint(*ENEMY_STATS[enemy_type]["health"])
         self.attack_power = random.randint(*ENEMY_STATS[enemy_type]["attack"])
 
