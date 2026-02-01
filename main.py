@@ -1,7 +1,8 @@
 # import json
 import random
 
-from combat import boss_fight, owlbear_ambush, pixie_encounter, wolf_ambush
+from combat import boss_fight, combat, owlbear_ambush, pixie_encounter, wolf_ambush
+from enemies import Enemy
 from player import Character, create_character
 from utils import game_over
 
@@ -149,6 +150,107 @@ def boss_intro():
 
 
 # ------------------------------------------------------------------------------------------------------------------
+# Glade_path
+def glade_path(character):
+    print(
+        "As you walk through the glade, the air grows thick with the scent of blooming flowers."
+    )
+    print(
+        "The scent is pleasant, a semi-sweet relaxing aroma, and you take a deep breath."
+    )
+    print("You feel a sense of peace wash over you.")
+    print(
+        "As you walk into the glade, you're surrounded by nothing but a field of red flowers."
+    )
+    print("What were you doing? Why did you come here? You can't remember.")
+    print(
+        "You realize the flowers must be doing something to you, and panic begins to set in."
+    )
+    print("What do you do?")
+
+    while True:
+        print(
+            "1. Rush through, trying to get to the edge of the flowers as quickly as possible."
+        )
+        print(
+            "2. Move carefully, trying to avoid the flowers and slowing your breathing."
+        )
+        print("3. Look for another way out of the poppy field.")
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            print("You take off, running as fast as your equipment will allow.")
+            print("Your breaths are shallow and rapid. Poppy pollen fills your lungs")
+            print(
+                "This glade stretches for what seems like miles, you'll never make it in time."
+            )
+            print("You collapse, strained by the pollen you've breathed in.")
+            damage = 25
+            result = character.take_damage(damage)
+            print(f"You lose {damage} health.")
+            if result == "died":
+                return "died"
+            print("You collapse to your hands and knees.")
+            print("You no longer feel the heat of the sun.")
+            print("Dazed, you look up unsure of what looms above you.")
+            guardian = Enemy("poppy_guardian")
+            result = combat(guardian, character, depth=1)
+            if result == "died":
+                return "died"
+            break
+        elif choice == "2":
+            print("You slow your pace, taking slow breaths.")
+            print(
+                "You cover your nose and mouth, trying to avoid the denser patches of flowers."
+            )
+            if character.health >= 50 or character.attack_power >= 15:
+                print(
+                    "Your strength of body allows you to push through the effects of the pollen."
+                )
+                print("You emerge from the glade, weakened, but alive.")
+                damage = 15
+                result = character.take_damage(damage)
+                print(f"You lose {damage} health.")
+                if result == "died":
+                    return "died"
+                break
+            else:
+                print("You're too weak to push through the effects of the pollen.")
+                print("You collapse, the pollen overcoming you.")
+                damage = 20
+                result = character.take_damage(damage)
+                print(f"You lose {damage} health.")
+                if result == "died":
+                    return "died"
+                print("Something stirs in the flowers!")
+                guardian = Enemy("poppy_guardian")
+                result = combat(guardian, character, depth=1)
+                if result == "died":
+                    return "died"
+                break
+        elif choice == "3":
+            print("\nYou scan the edges and spot a narrow unmarked trail!")
+            print("It's longer, but avoids most of the poppies.")
+            print("You still breathe in some pollen along the way...")
+            result = character.take_damage(10)
+            if result == "died":
+                return "died"
+            break
+        else:
+            print("Invalid choice.")
+            continue
+    print("\n" + "=" * 50)
+    print("You've made it through the poppy field!")
+    print("The experience has hardened you.")
+    character.level_up()
+    print("=" * 50)
+
+    return "survived"
+
+
+# Forest_path
+
+# ------------------------------------------------------------------------------------------------------------------
 
 
 def path_choice(character):
@@ -164,19 +266,13 @@ def path_choice(character):
         choice = input("Enter your choice: ")
         if choice == "1":
             print("You venture forth into the idyllic glade.")
-            print("flavor text here, poppies slowly make you sleepy")
-            # Stats roll check here
             character.path_taken = "glade"
-            character.level_up()
             return "glade"
         elif choice == "2":
             print(
                 "You double back, returning to the devil you know for the devil you don't."
             )
-            print("Flavor text here, you meet an adventurer who offers you a deal.")
-            # stats roll check here
             character.path_taken = "forest"
-            character.has_companion = True
             return "forest"
         else:
             print("Invalid choice.")
