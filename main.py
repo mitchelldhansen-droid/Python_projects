@@ -3,7 +3,7 @@ import random
 
 from combat import boss_fight, combat, owlbear_ambush, pixie_encounter, wolf_ambush
 from enemies import Enemy
-from player import Character, create_character
+from player import create_character
 from utils import game_over
 
 current_state = "GAME_START"
@@ -249,6 +249,78 @@ def glade_path(character):
 
 
 # Forest_path
+def forest_path(character):
+    print("\n" + "=" * 50)
+    print(
+        "You reenter the forest, having vanquished the Abomination earlier, you hope this time will be different."
+    )
+    print("As you walk deeper into the forest, you revisit the Abomination's hollow.")
+    print("As you get closer, you notice a torch burning in someone's hand.")
+    print("You see a fellow adventurer!")
+    print(
+        "'I know you're there, step into the light and join me.' the Adventurer says to you."
+    )
+    print("What do you do?")
+
+    while True:
+        print(
+            "1. Explain you defeated the Abomination and see if the Adventurer will join you. (Power Check)."
+        )
+        print(
+            "2. Offer gold to the Adventurer and see if they will join you. (10 gold)"
+        )
+        print(
+            "3. Ignore the Adventurer, and try to sneak past them on your way to bypass the glade."
+        )
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            # Stat check - based on attack power (looking capable)
+            print(
+                "\n'I could use someone with your skills,' you say. The strength of many beats the strength of one."
+            )
+            if character.attack_power >= 15:
+                print("The adventurer looks you over and nods approvingly.")
+                print("'You look like you can handle yourself. I'll join you.'")
+                character.has_companion = True
+                print("\nA companion has joined you!")
+            else:
+                print("The adventurer shakes their head.")
+                print("'You don't look strong enough to be worth following.'")
+                print("\nYou can still offer gold, or continue alone.")
+                continue  # Let them try another option
+        elif choice == "2":
+            if character.inventory.get_item_count("Gold") >= 10:
+                print("\nYou offer 10 gold pieces.")
+                print("The adventurer's eyes light up.")
+                print("'Gold speaks louder than words. I'm in.'")
+                character.inventory.remove_item("Gold", 10)
+                character.has_companion = True
+                print("\nA companion has joined you!")
+            else:
+                print(
+                    f"\nYou only have {character.inventory.get_item_count('Gold')} gold."
+                )
+                print("The adventurer scoffs. 'Come back when you have real coin.'")
+                continue  # Let them try another option
+
+        elif choice == "3":
+            print(
+                "\nYou dare not answer in case it's another trap, and continue on your way."
+            )
+            print(
+                "You do not recruit the Adventurer, the next battle will be difficult without help."
+            )
+        else:
+            print("Invalid choice.")
+            continue
+
+        print("\n" + "=" * 50)
+        print("You continue down the forest path...")
+        print("=" * 50)
+
+        return "survived"
+
 
 # ------------------------------------------------------------------------------------------------------------------
 
