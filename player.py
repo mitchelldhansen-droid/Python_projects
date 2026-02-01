@@ -13,6 +13,8 @@ class Character:
         self.attack_power = CLASS_STATS[player_class]["Attack"]
         self.magic = CLASS_STATS[player_class]["Magic"]
         self.inventory = Inventory()
+        self.has_companion = False
+        self.path_taken = None
 
     def display(self):
         print(" ")
