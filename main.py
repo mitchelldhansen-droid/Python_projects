@@ -216,7 +216,10 @@ if __name__ == "__main__":
             if result == "died":
                 current_state = "GAME_ENDING"
             else:
-                current_state = "VICTORY"
+                current_state = "PATH_CHOICE"
+        elif current_state == "PATH_CHOICE":
+            result = path_choice(character)
+            current_state = "VICTORY"
         elif current_state == "VICTORY":
             print("\n" + "=" * 50)
             print("Congratulations! You've completed the adventure!")
