@@ -35,6 +35,8 @@ def rest(character, is_dangerous=False):
         print("You rest by the rekindled fire. Health fully restored!")
     else:
         print("You're already at full health, but the rest is welcome.")
+    character.restore_spell_slots()
+    print("Your spell slots are fully restored.")
 
     character.inventory.add_item("Health Potion", 1)
     print("Searching the camp, you find a health potion left behind.")
@@ -42,7 +44,7 @@ def rest(character, is_dangerous=False):
     print("\nCurrent Status:")
     print(f"Health: {character.health}/{character.max_health}")
     print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
-
+    print(f"Spell Slots: {character.current_spell_slots}/{character.max_spell_slots}")
     return False
 
 

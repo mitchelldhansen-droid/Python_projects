@@ -24,8 +24,12 @@ class Character:
     def display(self):
         print(" ")
         print("===  CHARACTER CREATED  ===")
-        for key, value in self.__dict__.items():
-            print(f"{key}: {value}")
+        print(f"Name: {self.name}")
+        print(f"Class: {self.player_class}")
+        print(f"Health: {self.health}/{self.max_health}")
+        print(f"Attack: {self.attack_power}")
+        print(f"Magic: {self.magic}")
+        print(f"Spell Slots: {self.current_spell_slots}/{self.max_spell_slots}")
         print("===========================")
 
     def __str__(self):
