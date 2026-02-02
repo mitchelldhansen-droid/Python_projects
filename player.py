@@ -1,6 +1,7 @@
 import random
 
 from data.player_stats import CLASS_STATS, CLASSES
+from data.spell_stats import BASE_SPELL_SLOTS, CLASS_SPELLS
 from items import Inventory
 
 
@@ -16,6 +17,9 @@ class Character:
         self.level = 1
         self.has_companion = False
         self.path_taken = None
+        self.max_spell_slots = BASE_SPELL_SLOTS[player_class] + (self.magic // 10)
+        self.current_spell_slots = self.max_spell_slots
+        self.active_buffs = {}
 
     def display(self):
         print(" ")
@@ -73,11 +77,33 @@ class Character:
         self.health = self.max_health
         self.attack_power += 5
         self.magic += 5
+        self.max_spell_slots = self._calculate_max_slots()
+        self.current_spell_slots = self.max_spell_slots
         print(f"{self.name} has leveled up to level {self.level}!")
         print("+5 TO ALL STATS | +15 MAX HEALTH")
         print(
             f"Attack: {self.attack_power} | Magic: {self.magic} | Max Health: {self.max_health}"
         )
+
+    def restore_spell_slots(self):
+        self.current_spell_slots = self.max_spell_slots
+
+    def use_spell_slots(self, amount):
+        self.current_spell_slots -= amount
+
+    def get_available_spells(self):
+        return CLASS_SPELLS[self.player_class]
+
+    def can_cast(self, spell_key):
+        spell = CLASS_SPELLS[self.player_class][spell_key]
+        slots_required = spell["slots_required"]
+        if self.current_spell_slots >= slots_required:
+            return True
+        else:
+            return False
+
+    def _calculate_max_slots(self):
+        self.max_spell_slots = BASE_SPELL_SLOTS[self.player_class] + (self.magic // 10)
 
 
 def create_character():
