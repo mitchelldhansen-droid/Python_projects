@@ -303,6 +303,7 @@ def bandit_leader_combat(character):
             f"\nYour Health: {character.health} | Enemy Health: {bandit_leader.health}"
         )
         print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
+        print(f"Spell Slots: {character.current_spell_slots}/{character.max_spell_slots}")
         if character.has_companion:
             print(
                 "(Through coordinated strikes, Your Companion doubles your attack damage!)"
@@ -310,9 +311,14 @@ def bandit_leader_combat(character):
         print("1.Attack")
         print("2.Defend")
         print("3.Drink Potion")
-        action = input("Choose 1, 2, or 3:")
+        print("4.Cast Spell")
+        action = input("Choose 1, 2, 3, or 4:")
         if action == "1":
             damage = character.attack_power
+            if "attack_bonus" in character.active_buffs:
+                bonus = character.active_buffs.pop("attack_bonus")
+                damage += bonus
+                print(f"Your spell adds {bonus} damage!")
             if character.has_companion:
                 damage = damage * 2
                 print("You and your companion strike together!")
@@ -327,6 +333,25 @@ def bandit_leader_combat(character):
         elif action == "3":
             result = character.use_potion()
             if result == "no_potion":
+                continue
+        elif action == "4":
+            spell_keys = display_spell_menu(character)
+            spell_choice = input("Choose a spell (or 'back' to cancel): ")
+            if spell_choice.lower() == "back":
+                continue
+            try:
+                index = int(spell_choice) - 1
+                if 0 <= index < len(spell_keys):
+                    spell_key = spell_keys[index]
+                    result = cast_spell(character, spell_key, target=bandit_leader)
+                    print(result["message"])
+                    if not result["success"]:
+                        continue
+                else:
+                    print("Invalid spell choice")
+                    continue
+            except (ValueError, IndexError):
+                print("Invalid spell choice.")
                 continue
         else:
             print("Invalid action!")
@@ -346,8 +371,20 @@ def bandit_leader_combat(character):
             print("You were defeated by the bandit leader!")
             return "died"
         elif not skip_enemy_turn:
-            bandit_leader.attack(character)
-            print(f"Health is now: {character.health}")
+            if "dodge" in character.active_buffs:
+                character.active_buffs.pop("dodge")
+                print(f"You dodge the {bandit_leader.name}'s attack!")
+            elif "shield" in character.active_buffs:
+                shield_value = character.active_buffs.pop("shield")
+                blocked = min(shield_value, bandit_leader.attack_power)
+                remaining_damage = bandit_leader.attack_power - blocked
+                print(f"Your shield absorbs {blocked} damage!")
+                if remaining_damage > 0:
+                    character.take_damage(remaining_damage)
+                print(f"Health is now: {character.health}")
+            else:
+                bandit_leader.attack(character)
+                print(f"Health is now: {character.health}")
             if character.health <= 0:
                 print(f"You were defeated by the {bandit_leader.name}!")
                 return "died"
