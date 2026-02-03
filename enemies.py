@@ -1,6 +1,7 @@
 import random
 
 from data.enemy_stats import ENEMY_STATS
+from signals import Signal
 
 
 class Enemy:
@@ -8,12 +9,16 @@ class Enemy:
         self.name = enemy_type.replace("_", " ").title()
         self.health = random.randint(*ENEMY_STATS[enemy_type]["health"])
         self.attack_power = random.randint(*ENEMY_STATS[enemy_type]["attack"])
+        self.damaged = Signal()
+        self.died = Signal()
 
     def take_damage(self, damage):
         self.health -= damage
+        self.damaged.emit(self, damage)
         if self.health <= 0:
             self.health = 0
             print(f"{self.name} has been defeated!!")
+            self.died.emit(self)
             return "died"
         else:
             print(f"{self.name} has taken {damage} damage.")
