@@ -17,11 +17,9 @@ class Enemy:
         self.damaged.emit(self, damage)
         if self.health <= 0:
             self.health = 0
-            print(f"{self.name} has been defeated!!")
             self.died.emit(self)
             return "died"
         else:
-            print(f"{self.name} has taken {damage} damage.")
             return "damaged"
 
     def attack(self, target):

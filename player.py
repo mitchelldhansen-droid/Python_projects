@@ -45,11 +45,8 @@ class Character:
         if self.health <= 0:
             self.health = 0
             self.died.emit(self)
-            print(f"{self.name} has been defeated!")
             return "died"
         else:
-            print(f"{self.name} has taken {damage} damage.")
-            print(f"Health is now: {self.health}")
             return "damaged"
 
     def heal(self, amount):
