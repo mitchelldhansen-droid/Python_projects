@@ -3,6 +3,7 @@ import random
 from data.player_stats import CLASS_STATS, CLASSES
 from data.spell_stats import BASE_SPELL_SLOTS, CLASS_SPELLS
 from items import Inventory
+from signals import Signal
 
 
 class Character:
@@ -20,6 +21,9 @@ class Character:
         self.max_spell_slots = BASE_SPELL_SLOTS[player_class] + (self.magic // 10)
         self.current_spell_slots = self.max_spell_slots
         self.active_buffs = {}
+        self.damaged = Signal()
+        self.healed = Signal()
+        self.died = Signal()
 
     def display(self):
         print(" ")
@@ -37,8 +41,10 @@ class Character:
 
     def take_damage(self, damage):
         self.health -= damage
+        self.damaged.emit(self, damage)
         if self.health <= 0:
             self.health = 0
+            self.died.emit(self)
             print(f"{self.name} has been defeated!")
             return "died"
         else:
@@ -49,6 +55,7 @@ class Character:
     def heal(self, amount):
         actual_heal = min(amount, self.max_health - self.health)
         self.health += actual_heal
+        self.healed.emit(self, actual_heal)
         print(f"{self.name} has been healed for {actual_heal} health.")
         return "healed"
 
