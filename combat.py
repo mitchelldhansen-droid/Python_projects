@@ -303,7 +303,9 @@ def bandit_leader_combat(character):
             f"\nYour Health: {character.health} | Enemy Health: {bandit_leader.health}"
         )
         print(f"Potions: {character.inventory.get_item_count('Health Potion')}")
-        print(f"Spell Slots: {character.current_spell_slots}/{character.max_spell_slots}")
+        print(
+            f"Spell Slots: {character.current_spell_slots}/{character.max_spell_slots}"
+        )
         if character.has_companion:
             print(
                 "(Through coordinated strikes, Your Companion doubles your attack damage!)"
