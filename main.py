@@ -11,9 +11,30 @@ from combat import (
 )
 from enemies import Enemy
 from player import create_character
+from save_game import load_game, offer_save
 from utils import game_over
 
-current_state = "GAME_START"
+
+def game_start():
+    print("Welcome to the game!")
+    print("What would you like to do?")
+    print("1. Start a new game")
+    print("2. Load a saved game")
+    choice = input("Enter your choice: ")
+    if choice == "1":
+        return None, "GAME_START"
+    elif choice == "2":
+        try:
+            character, current_state = load_game()
+            return character, current_state
+        except FileNotFoundError:
+            print("No save file found! Starting a new game...")
+            current_state = "GAME_START"
+            character = None
+            return character, current_state
+    else:
+        print("Invalid choice. Please try again.")
+        return game_start()
 
 
 def rest(character, is_dangerous=False):
@@ -361,7 +382,7 @@ def path_choice(character):
 
 
 if __name__ == "__main__":
-    character = None
+    character, current_state = game_start()
     while True:
         if current_state == "GAME_START":
             character = create_character()
@@ -378,6 +399,7 @@ if __name__ == "__main__":
             if result == "died":
                 current_state = "GAME_ENDING"
             else:
+                offer_save(character, "CAMPSITE_MENU")
                 current_state = "BOSS_INTRO"
         elif current_state == "BOSS_INTRO":
             boss_intro()
@@ -387,6 +409,7 @@ if __name__ == "__main__":
             if result == "died":
                 current_state = "GAME_ENDING"
             else:
+                offer_save(character, "PIXIE_ENCOUNTER")
                 current_state = "PIXIE_ENCOUNTER"
         elif current_state == "PIXIE_ENCOUNTER":
             result = pixie_encounter(character)
@@ -405,6 +428,7 @@ if __name__ == "__main__":
             if result == "died":
                 current_state = "GAME_ENDING"
             else:
+                offer_save(character, "BANDIT_COMBAT")
                 current_state = "BANDIT_COMBAT"
         elif current_state == "FOREST_PATH":
             result = forest_path(character)

@@ -23,3 +23,9 @@ def load_game(filename="savegame.json"):
 
     print("Game Loaded!")
     return character, current_state
+
+
+def offer_save(character, state):
+    choice = input("Save your progress? (y/n): ")
+    if choice.lower() == "y":
+        save_game(character, state)
