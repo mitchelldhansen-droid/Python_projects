@@ -1,0 +1,21 @@
+{
+  "character": {
+    "name": "SaveTest",
+    "player_class": "Mage",
+    "level": 2,
+    "attack_power": 5,
+    "magic": 20,
+    "health": 35,
+    "max_health": 60,
+    "max_spell_slots": 7,
+    "current_spell_slots": 7,
+    "has_companion": false,
+    "path_taken": null,
+    "inventory": {
+      "Health Potion": 3,
+      "Knife": 0,
+      "Gold": 0
+    }
+  },
+  "current_state": "CAMPSITE_MENU"
+}
