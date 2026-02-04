@@ -1,4 +1,5 @@
 # import json
+import json
 import random
 
 from combat import (
@@ -32,6 +33,9 @@ def game_start():
             current_state = "GAME_START"
             character = None
             return character, current_state
+        except json.JSONDecodeError:
+            print("Save file corrupted! Starting a new game...")
+            return None, "GAME_START"
     else:
         print("Invalid choice. Please try again.")
         return game_start()
