@@ -129,6 +129,21 @@ class Character:
             "inventory": self.inventory.items,
         }
 
+    @classmethod
+    def from_dict(cls, data):
+        character = cls(data["name"], data["player_class"])
+        character.level = data["level"]
+        character.attack_power = data["attack_power"]
+        character.magic = data["magic"]
+        character.health = data["health"]
+        character.max_health = data["max_health"]
+        character.max_spell_slots = data["max_spell_slots"]
+        character.current_spell_slots = data["current_spell_slots"]
+        character.has_companion = data["has_companion"]
+        character.path_taken = data["path_taken"]
+        character.inventory.items = data["inventory"]
+        return character
+
 
 def create_character():
     name = input("What is your character's name?")
