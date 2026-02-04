@@ -6,6 +6,26 @@ from spells import cast_spell, display_spell_menu
 
 def combat(enemy, character, depth=0):
     print(f"a {enemy.name} appears! Health: {enemy.health}")
+
+    # Define listener functions
+    def on_char_damaged(c, amt):
+        print(f"{c.name} has taken {amt} damage. Health: {c.health}")
+
+    def on_char_died(c):
+        print(f"{c.name} has been defeated!")
+
+    def on_enemy_damaged(e, amt):
+        print(f"{e.name} has taken {amt} damage. Health: {e.health}")
+
+    def on_enemy_died(e):
+        print(f"{e.name} has been defeated!")
+
+    # Connect them
+    character.damaged.connect(on_char_damaged)
+    character.died.connect(on_char_died)
+    enemy.damaged.connect(on_enemy_damaged)
+    enemy.died.connect(on_enemy_died)
+
     while enemy.health > 0 and character.health > 0:
         skip_enemy_turn = False
         print(f"Your Health: {character.health} | Enemy Health: {enemy.health}")
@@ -74,11 +94,15 @@ def combat(enemy, character, depth=0):
                     skeleton = Enemy("skeleton")
                     result = combat(skeleton, character, depth + 1)
                     if result == "died":
+                        character.damaged.disconnect(on_char_damaged)
+                        character.died.disconnect(on_char_died)
                         return "died"
             else:
                 print(f"The {enemy.name} had nothing useful..")
         elif character.health <= 0:
             print(f"You were defeated by the {enemy.name}!")
+            character.damaged.disconnect(on_char_damaged)
+            character.died.disconnect(on_char_died)
             return "died"
         elif not skip_enemy_turn:
             if "dodge" in character.active_buffs:
@@ -97,7 +121,12 @@ def combat(enemy, character, depth=0):
                 print(f"Health is now: {character.health}")
             if character.health <= 0:
                 print(f"You were defeated by the {enemy.name}!")
+                character.damaged.disconnect(on_char_damaged)
+                character.died.disconnect(on_char_died)
                 return "died"
+
+    character.damaged.disconnect(on_char_damaged)
+    character.died.disconnect(on_char_died)
     return "survived"
 
 
@@ -297,6 +326,26 @@ def bandit_leader_combat(character):
             "'Together, we might be able to challenge him to a duel and take him down.'"
         )
     bandit_leader = Enemy("bandit_leader")
+
+    # Define listener functions
+    def on_char_damaged(c, amt):
+        print(f"{c.name} has taken {amt} damage. Health: {c.health}")
+
+    def on_char_died(c):
+        print(f"{c.name} has been defeated!")
+
+    def on_enemy_damaged(e, amt):
+        print(f"{e.name} has taken {amt} damage. Health: {e.health}")
+
+    def on_enemy_died(e):
+        print(f"{e.name} has been defeated!")
+
+    # Connect them
+    character.damaged.connect(on_char_damaged)
+    character.died.connect(on_char_died)
+    bandit_leader.damaged.connect(on_enemy_damaged)
+    bandit_leader.died.connect(on_enemy_died)
+
     while bandit_leader.health > 0 and character.health > 0:
         skip_enemy_turn = False
         print(
@@ -371,6 +420,8 @@ def bandit_leader_combat(character):
             # Any victory rewards/narrative here
         elif character.health <= 0:
             print("You were defeated by the bandit leader!")
+            character.damaged.disconnect(on_char_damaged)
+            character.died.disconnect(on_char_died)
             return "died"
         elif not skip_enemy_turn:
             if "dodge" in character.active_buffs:
@@ -389,5 +440,10 @@ def bandit_leader_combat(character):
                 print(f"Health is now: {character.health}")
             if character.health <= 0:
                 print(f"You were defeated by the {bandit_leader.name}!")
+                character.damaged.disconnect(on_char_damaged)
+                character.died.disconnect(on_char_died)
                 return "died"
+
+    character.damaged.disconnect(on_char_damaged)
+    character.died.disconnect(on_char_died)
     return "survived"

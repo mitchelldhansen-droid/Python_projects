@@ -111,7 +111,7 @@ class Character:
             return False
 
     def _calculate_max_slots(self):
-        self.max_spell_slots = BASE_SPELL_SLOTS[self.player_class] + (self.magic // 10)
+        return BASE_SPELL_SLOTS[self.player_class] + (self.magic // 10)
 
 
 def create_character():
