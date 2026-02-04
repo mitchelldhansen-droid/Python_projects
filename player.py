@@ -113,6 +113,22 @@ class Character:
     def _calculate_max_slots(self):
         return BASE_SPELL_SLOTS[self.player_class] + (self.magic // 10)
 
+    def to_dict(self):
+        return {
+            "name": self.name,
+            "player_class": self.player_class,
+            "level": self.level,
+            "attack_power": self.attack_power,
+            "magic": self.magic,
+            "health": self.health,
+            "max_health": self.max_health,
+            "max_spell_slots": self.max_spell_slots,
+            "current_spell_slots": self.current_spell_slots,
+            "has_companion": self.has_companion,
+            "path_taken": self.path_taken,
+            "inventory": self.inventory.items,
+        }
+
 
 def create_character():
     name = input("What is your character's name?")
