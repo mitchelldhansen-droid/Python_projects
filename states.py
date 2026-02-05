@@ -1,4 +1,4 @@
-from main import campsite_menu, character, boss_intro
+from main import campsite_menu, character, boss_intro, path_choice
 from player import create_character
 from combat import boss_fight, wolf_ambush, pixie_encounter
 from save_game import offer_save
@@ -54,6 +54,23 @@ class BossFightState(State):
         else:
             offer_save(game.character, "PIXIE_ENCOUNTER")
             return PixieEncounterState()
+
+class PixieEncounterState(State):
+    def update(self,game):
+        result = pixie_encounter(game.character)
+        if result == "died":
+            return GameEndingState()
+        else:
+            offer_save(game.character, "PATH_CHOICE")
+            return PathChoiceState()
+
+class PathChoiceState(State):
+    def update(self, game):
+        result = path_choice(game.character)
+        if result == "glade":
+            return GladePathState()
+        else:
+            return ForestPathState()
 
 class GameEndingState(State):
     def update(self, game):
