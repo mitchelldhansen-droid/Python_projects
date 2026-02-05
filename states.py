@@ -1,6 +1,7 @@
-from main import campsite_menu, character
+from main import campsite_menu, character, boss_intro
 from player import create_character
-from combat import wolf_ambush
+from combat import boss_fight, wolf_ambush, pixie_encounter
+from save_game import offer_save
 
 class State:
     def enter (self, game):
@@ -31,9 +32,28 @@ class WolfCombatState(State):
         else:
             return CampsiteMenuState()
 
-class GameEndingState(State):
-    def update(self, game):
-
 class CampsiteMenuState(State):
     def update(self, game):
-        result = campsite_menu()
+        result = campsite_menu(game.character)
+        if result == "died":
+            return GameEndingState()
+        else:
+            offer_save(game.character,"CAMPSITE_MENU")
+            return BossIntroState()
+
+class BossIntroState(State):
+    def update(self,game):
+        boss_intro()
+        return BossFightState()
+
+class BossFightState(State):
+    def update(self,game):
+        result = boss_fight(game.character)
+        if result == "died":
+            return GameEndingState()
+        else:
+            offer_save(game.character, "PIXIE_ENCOUNTER")
+            return PixieEncounterState()
+
+class GameEndingState(State):
+    def update(self, game):
