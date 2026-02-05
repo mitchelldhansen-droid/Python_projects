@@ -1,0 +1,21 @@
+{
+  "character": {
+    "name": "Zelena",
+    "player_class": "Warrior",
+    "level": 2,
+    "attack_power": 20,
+    "magic": 10,
+    "health": 115,
+    "max_health": 115,
+    "max_spell_slots": 3,
+    "current_spell_slots": 3,
+    "has_companion": true,
+    "path_taken": "forest",
+    "inventory": {
+      "Health Potion": 9,
+      "Knife": 0,
+      "Gold": 10
+    }
+  },
+  "current_state": "BANDIT_COMBAT"
+}
