@@ -1,6 +1,6 @@
-from main import campsite_menu, character, boss_intro, path_choice
+from main import campsite_menu, character, boss_intro, glade_path, path_choice, forest_path
 from player import create_character
-from combat import boss_fight, wolf_ambush, pixie_encounter
+from combat import bandit_leader_combat, boss_fight, wolf_ambush, pixie_encounter
 from save_game import offer_save
 
 class State:
@@ -71,6 +71,30 @@ class PathChoiceState(State):
             return GladePathState()
         else:
             return ForestPathState()
+
+class GladePathState(State):
+    def update(self, game):
+        result = glade_path(game.character)
+        if result == "died":
+            return GameEndingState()
+        else:
+            offer_save(game.character, "BANDIT_COMBAT")
+            return BanditCombatState()
+
+class ForestPathState(State):
+    def update(self, game):
+        forest_path(game.character)
+        offer_save(game.character, "BANDIT_COMBAT")
+        return BanditCombatState()
+
+class BanditCombatState(State):
+    def update(self,game):
+        result = bandit_leader_combat(game.character)
+        if result == "died":
+            return GameEndingState()
+        else:
+            return GameVictoryState()
+
 
 class GameEndingState(State):
     def update(self, game):
