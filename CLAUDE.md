@@ -50,6 +50,14 @@ Currently working on simple state machines to control user flow
 - Merge to main when the feature works: `git checkout main && git merge feature/inventory`
 - Delete the branch after merging: `git branch -d feature/inventory`
 
+## Python Conventions & Common Mistakes
+- Always instantiate classes with parentheses: `Inventory()` not `Inventory`
+- Watch for capitalization in dictionary keys: `character['name']` vs `character['Name']`
+- After refactoring function signatures, check ALL call sites for stale arguments
+- Don't delete variable assignments without verifying the variable is used downstream
+- Check that all imports resolve correctly after moving functions between files
+- Trace code execution before declaring it correct — don't just eyeball it
+
 ## Notes
 - This RPG doesn't need to be polished—it's a learning vehicle
 - Skills here transfer to GDScript for Project Zelena (visual novel in Godot 4.5 + Dialogic 2)
